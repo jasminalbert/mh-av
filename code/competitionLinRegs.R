@@ -35,7 +35,7 @@ for (p in rownames(comps)){
 	#bdat2 <- mas$max_density_halfm2[pair]
 	main <- paste0("fc:",fc,"-bg:",bg)
 
-	plot(bdat1,fdat, main=main, xlim=c(0,bmax1),ylim=ylim,col=cols[fc])
+	plot(bdat1,fdat, main=main, xlim=c(0,bmax1),ylim=ylim,col=cols[as.character(fc)],pch=19)
 	#plot(bdat2,fdat, main=main, xlim=c(0,bmax2),ylim=ylim)
 	if (bg!="Control"){
 	model <- summary(lm(fdat~bdat1))
@@ -48,8 +48,8 @@ for (p in rownames(comps)){
 	lines(x,y)
 	text(0,fmax*.83,paste0("y=",signif(m,3),"x+", signif(b,3),"\np=", signif(pv,3),", R2=",signif(r,3)), adj=c(0,0))
 	if (bg!=bgend){
-		plot(fdat,bdat1, main=main, xlim=c(0,bmax1),ylim=ylim,col=cols[fc])
-	} else if(bg==bgend){points(fdat,bdat1,col=cols[fc])}
+	#	plot(fdat,bdat1, main=main, xlim=c(0,bmax1),ylim=ylim,col=cols[fc])
+	} else if(bg==bgend){}#points(fdat,bdat1,col=cols[fc])}
 	bgend <- bg
 	}
 }
