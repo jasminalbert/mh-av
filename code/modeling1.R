@@ -31,78 +31,65 @@ max(mas$tot_stems)
 2/116.959 #=0.01710001 AV g/seed  
 #this is for the whole subplot but the plot was divided into six subsubplots?
 #divide maxstemsout by 6 to get bg seeds in?
-head(mas)
-reshape(mas,direction="long")
-mhOutputIntra <- mas[mas$phyto=="TACA" & mas$role=="competitor"&mas$output>0,]$output
-avOutputIntra <- mas$output[mas$phyto=="AVBA" & mas$role=="competitor"&mas$output>0]
-mhmn<-mean(mhOutputIntra);mhsd<-sd(mhOutputIntra)
-avmn<-mean(avOutputIntra);avsd<-sd(avOutputIntra)
-avmn <- 25
-sd <- 25
-hist(mhOutputIntra)
-hist(avOutputIntra,10)
-range(avOutputIntra)
-hist(rnorm(500,mhmn,mhsd*.5))
-range(rnorm(500,mhmn,mhsd*.5))
-avran <- rnorm(500,avmn,avsd*.3)
-avran <- exp(rnorm(500,log(avmn),log(avsd)*.3))
-avran <- avran[avran<65&avran>15]
-hist(avran,breaks=10)
-rvarstem2seeds <- cbind(TACA=mhran[1:length(avran)],AVBA=avran)
-head(rvarstem2seeds)
+#head(mas)
+#reshape(mas,direction="long")
+
 idend <- which(names(mas)=="subplot")
 datid <- mas[,1:idend]
 seeddat <- mas[,-(1:idend)];head(seeddat)
 seeddat <- seeddat[,!names(seeddat)%in%c("phytonum", "role")]
 dat <- data.frame(matrix(ncol=4,dimnames= list(NULL,c("mhIn","mhOut","avIn","avOut"))))
-sp <- c("TACA","AVBA")
-seedstore <- data.frame(matrix(ncol=2,dimnames= list(NULL,sp)))
-seedres <- list(In=seedstore,Out=seedstore)
-for (i in 1:nrow(seeddat)){
-	sdat <- seeddat[i,]
-	isp <- as.character(sdat$phyto)
-	seedsin <- c(phy=3,bg=sdat$max_density_halfm2)
-	sam <- sample(1:nrow(rvarstem2seeds),1)
-	seedsout <- c(phy=sdat$tot_seeds,bg=sdat$mean_density_halfm2* rvarstem2seeds[[sam,isp]])
-	if(sdat$background==isp){
-		phyto <- sum(seedsin)
-		background <- 0
-		phyto_o <-  sum(seedsout)
-		background_o <- background
-	} else {
-		phyto <- seedsin["phy"]; 
-		background <- seedsin["bg"]
-		phyto_o <- seedsout['phy']
-		background_o <- seedsout['bg']
-		}
-	seedres$In[i,isp] <- phyto
-	seedres$In[i,sp!=isp] <- background 	
-	seedres$Out[i,isp] <- phyto_o
-	seedres$Out[i,sp!=isp] <- background_o	
-}
-n<-sample(1:216,1);cbind(seedres$In,seedres$Out,seeddat)[n,]
 
-
-seed <- cbind(seedres$In,seedres$Out)
-names(seed) <- paste0(names(seed),rep(names(seedres),each=2))
+seeddat <- mas
+#n<-sample(1:216,1);cbind(seedres$In,seedres$Out,seeddat)[n,]
+seed <- prepSeeds(seeddat)
+saveRDS(seed,"si-so.RDS")
 
 ag <- .9
 #m1E <- as.formula(log(ERseedout +1) ~  log(eg*(ERseedin+1)*exp(log(lambda)-log((1+aiE*(ERseedin+1)*eg+aiA*(AVseedin+1)*ag)))))
 
 m1m <- as.formula(log(TACAOut +1) ~  log((TACAIn+1)*exp(log(lambda)-log(1+aiM*(TACAIn+1)+aiA*(AVBAIn+1)))))
-MHoutput <- as.data.frame(matrix(nrow = 0, ncol = 6))
-names(MHoutput) = c("estimate", "se", "t", "p", "params", "species")
 
-m1out <- nlsLM(m1m, start=list(lambda=1, aiM = .01, aiA=.01),
-                 lower = c(0, 0, 0), upper = c(200, 1, 1),
-                 control=nls.lm.control(maxiter=500), trace=T,
-                 data = seed[!is.na(seed$TACAOut),])
-  
- outreport <- as.data.frame(summary(m1out)$coef[1:3, 1:4])
-  names(outreport) = c("estimate", "se", "t", "p")
-  outreport$params <- row.names(outreport)
-  outreport$species <- "MH"
-  MHoutput <- rbind(MHoutput, outreport)
+#m1A <- as.formula(log(AVseedot +1) ~  log(ag*(AVseedin+1)*exp(log(lambda)-log((1+aiE*(ERseedin+1)*eg+aiA*(AVseedin+1)*ag)))))
+m1A <- as.formula(log(AVBAOut +1) ~  log((AVBAIn+1)*exp(log(lambda)-log(1+aiM*(TACAIn+1)+aiA*(AVBAIn+1)))))
+models <- list(mh=m1m,av=m1A)
+modelOut <- fitModels(models,seed1)
+modelOut==mo
+
+
+
+
+plot(seed$TACAIn[seed$AVBAIn==0],seed$TACAOut[seed$AVBAIn==0])
+plot(seed$TACAIn,seed$TACAOut)
+plot((log(seed$TACAIn+1)+1)/(log(seed$AVBAIn+1)+1),log(seed$TACAOut+1))
+
+
+sz <- round(log(seed$TACAOut+1))*.5+0.5
+cl <- round(log(seed$TACAOut+1))+1
+cols <- hcl.colors(20,"Viridis", alpha=0.1,T)[1:9]
+plot(log(seed$TACAIn+1),log(seed$AVBAIn+1), cex=sz, col=cols[cl],pch=19, xlim=c(0,5), ylim=c(-0.5,4))
+sz <- round(log(seed$AVBAOut+1))*.5+0.5
+cl <- round(log(seed$AVBAOut+1))+1
+cols <- hcl.colors(20,"Viridis", alpha=0.1,T)[1:7]
+plot(log(seed$TACAIn+1),log(seed$AVBAIn+1), cex=sz, col=cols[cl],pch=19, xlim=c(0,5), ylim=c(-0.5,4))
+image(x=log(seed$TACAIn+1),y=log(seed$AVBAIn+1),z=seeds$TACAOut )
+lsds <- log(seed+1)
+plot(lsds$TACAIn,lsds$TACAOut,col=mcol)
+plot(lsds$TACAIn,lsds$AVBAOut,col=acol)
+
+plot(lsds$AVBAIn,lsds$TACAOut)
+
+#plot model estimates versus true values
+#unique pairs of seedsIn and maybe mean of actual seeds out in those pairs and difference with prediction using model parameter estimates.
+
+
+#differences when using a mean instead of distribution for ets seeds out bg?
+#or maybe it should be treatment specific... 
+#make function for all this 
+#or maybe I need to make the neighbourhood smaller...
+
+
+
 
 
 
