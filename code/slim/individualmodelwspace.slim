@@ -1,0 +1,94 @@
+//individual model no space finished Jan 22 2025
+
+species all initialize(){
+	initializeSLiMModelType("nonWF");
+	defineConstant("ag", 0.92);
+	defineConstant("mg", 0.87);	
+	defineConstant("lam_a", 29.35287);
+	defineConstant("lam_a_dev", 15.4); //later read in estimates to sample
+	defineConstant("lam_m", 30.72222);		
+	defineConstant("a_aa", 0.1033578);
+	defineConstant("a_aa_dev", 0.0195);
+	defineConstant("a_mm", 0.03013569);
+	defineConstant("a_mm_dev", 0.0033);
+	defineConstant("a_am", 0); //mh on av
+	defineConstant("a_am_dev", 0.001559);
+	defineConstant("a_ma", 0.0685481); //av on mh
+	defineConstant("a_ma_dev", 0.015);	
+	
+	defineConstant("N0_a", 2);
+	defineConstant("N0_m", 1);	
+}
+
+species AV initialize() {
+	initializeSpecies(avatar="🐄", color="magenta");
+	//initializeSLiMOptions(dimensionality="xy");
+}
+species MH initialize() {
+	initializeSpecies(avatar="👽", color="grey");
+	//initializeSLiMOptions(dimensionality="xy");
+}
+ticks all 1 early() {
+	MH.addSubpop("p1", N0_m);
+	AV.addSubpop("p2", N0_a);
+}
+
+// non-overlapping generations:parents die, offspring live
+species AV survival(){
+	return(individual.age==0);
+}
+species MH survival(){
+	return(individual.age==0);
+}
+
+species AV reproduction(){
+	if (individual.tag<1)
+		return;
+	seeds = rpois(1,lam_a);
+	print(paste("lam_a",seeds));
+	percap_intra = rnorm(1,a_aa,a_aa_dev);
+	comp_intra = subpop.individualCount*percap_intra;
+	percap_inter = rnorm(1,a_am,a_am_dev);	
+	comp_inter = MH.subpopulations.individualCount*percap_inter;
+	competition = comp_intra + comp_inter;	
+	seeds = asInteger(seeds/(1+competition));
+	print(paste("seeds_a",seeds));
+	if (seeds > 0){
+		mate = subpop.sampleIndividuals(1);
+		for (i in seqLen(seeds))
+			subpop.addCrossed(individual, mate);
+	}
+}		
+species MH reproduction(){
+	if (individual.tag<1)
+		return;
+	seeds = rpois(1,lam_m);
+	print(paste("lam_m",seeds));
+	percap_intra = rnorm(1,a_mm,a_mm_dev);
+	comp_intra = subpop.individualCount*percap_intra;
+	percap_inter = rnorm(1,a_ma,a_ma_dev);
+	comp_inter = AV.subpopulations.individualCount*percap_inter;
+	competition = comp_intra + comp_inter;	
+	seeds = asInteger(seeds/(1+competition));
+	print(paste("seeds_m",seeds));
+	if (seeds > 0){
+		mate = subpop.sampleIndividuals(1);
+		for (i in seqLen(seeds))
+			subpop.addCrossed(individual, mate);
+	}
+}	
+
+ticks all early() { //germination after seeds are made
+	av = AV.subpopulations.individuals;
+	mh = MH.subpopulations.individuals;
+	
+	av.tag = rbinom(av.size(),1,ag);
+	mh.tag = rbinom(mh.size(),1,mg);
+}
+
+
+ticks all 100 late() {
+
+}
+
+
