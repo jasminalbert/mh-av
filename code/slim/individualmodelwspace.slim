@@ -1,6 +1,7 @@
-//individual model no space finished Jan 22 2025
+//individual model with space starting on Jan 23 2025
 
 species all initialize(){
+	setSeed(36363);
 	initializeSLiMModelType("nonWF");
 	defineConstant("ag", 0.92);
 	defineConstant("mg", 0.87);	
@@ -16,21 +17,45 @@ species all initialize(){
 	defineConstant("a_ma", 0.0685481); //av on mh
 	defineConstant("a_ma_dev", 0.015);	
 	
-	defineConstant("N0_a", 2);
-	defineConstant("N0_m", 1);	
+	defineConstant("N0_a", 100);
+	defineConstant("N0_m", 500);	
+	
+	defineConstant("CROSS_SCRIPT","subpop.addCrossed(individual,mate);");
+	
+	
+//spatial interactions
+	//10x10m square
+	defineConstant("SIDE",5); 
+	defineConstant("S", SIDE*SIDE);
+	//
+	defineConstant("S_comp", 0.15); //competion distance 15cm
+	defineConstant("D_a", 1.5); //AV max dispersal
+	//Barraso 2006 weeds max is 1.5, N~(.75,.2)
+	defineConstant("D_m", 2.0); //MH max dispersal
+	//Davies 2008
+	
+initializeInteractionType(1,"xy",maxDistance=S_comp);	
+	i1.setInteractionFunction('l',1.0); //'l' is linear func
+	
+
 }
 
 species AV initialize() {
 	initializeSpecies(avatar="🐄", color="magenta");
-	//initializeSLiMOptions(dimensionality="xy");
+	initializeSLiMOptions(dimensionality="xy");
 }
 species MH initialize() {
 	initializeSpecies(avatar="👽", color="grey");
-	//initializeSLiMOptions(dimensionality="xy");
+	initializeSLiMOptions(dimensionality="xy");
 }
 ticks all 1 early() {
 	MH.addSubpop("p1", N0_m);
+	p1.setSpatialBounds(c(0,0,SIDE,SIDE));
+	p1.individuals.setSpatialPosition(runif(N0_m*2,0,1)+3);//p1.pointUniform(N0_m));
+	
 	AV.addSubpop("p2", N0_a);
+	p2.setSpatialBounds(c(0,0,SIDE,SIDE));
+	p2.individuals.setSpatialPosition(runif(N0_a*2,0,1)+2);//p2.pointUniform(N0_a));
 }
 
 // non-overlapping generations:parents die, offspring live
@@ -41,22 +66,73 @@ species MH survival(){
 	return(individual.age==0);
 }
 
+ticks all 2: first(){
+	MH_pop = MH.subpopulations;
+	MHinds = MH_pop.individuals;
+	AV_pop = AV.subpopulations;
+	AVinds = AV_pop.individuals;
+	
+	//access densities, per individual
+	i1.evaluate(c(MH_pop,AV_pop));
+	AVdensitybyMH = i1.interactingNeighborCount(MHinds, AV_pop);
+	//localPopulationDensity(MHinds, AV_pop);
+	MHdensitybyAV = i1.interactingNeighborCount(AVinds, MH_pop);
+	//localPopulationDensity(AVinds, MH_pop);
+	MHdensitybyMH = i1.interactingNeighborCount(MHinds);
+	//localPopulationDensity(MHinds, MH_pop);	
+	AVdensitybyAV = i1.interactingNeighborCount(AVinds);
+	//localPopulationDensity(AVinds, AV_pop);	
+//need to scale by distance? not just counts	
+for (av in AVinds)
+{
+nbs_intra = i1.interactingNeighborCount(av);
+nbs_inter = i1.interactingNeighborCount(av,MH_pop);
+av.setValue("intra",rnorm(1,a_aa,a_aa_dev)*nbs_intra);
+av.setValue("inter",rnorm(1,a_am,a_am_dev)*nbs_inter);
+}
+for (mh in MHinds)
+{
+nbs_intra = i1.interactingNeighborCount(mh);
+nbs_inter = i1.interactingNeighborCount(mh,AV_pop);
+mh.setValue("intra",rnorm(1,a_mm,a_mm_dev)*nbs_intra);
+mh.setValue("inter",rnorm(1,a_ma,a_ma_dev)*nbs_inter);
+}
+	
+}
+
 species AV reproduction(){
 	if (individual.tag<1)
-		return;
+		return;		
+		
 	seeds = rpois(1,lam_a);
 	print(paste("lam_a",seeds));
 	percap_intra = rnorm(1,a_aa,a_aa_dev);
 	comp_intra = subpop.individualCount*percap_intra;
 	percap_inter = rnorm(1,a_am,a_am_dev);	
 	comp_inter = MH.subpopulations.individualCount*percap_inter;
-	competition = comp_intra + comp_inter;	
+	competition = individual.getValue('intra')+individual.getValue('inter');
+	//competition = comp_intra + comp_inter;	
 	seeds = asInteger(seeds/(1+competition));
 	print(paste("seeds_a",seeds));
 	if (seeds > 0){
-		mate = subpop.sampleIndividuals(1);
-		for (i in seqLen(seeds))
-			subpop.addCrossed(individual, mate);
+		mate = subpop.sampleIndividuals(1);		
+		//mate = i1.drawByStrength(individual);
+		//if(mate.size()){ 
+			//set this if want spatial structure in mating 
+			//i dont think it matters here bc wind pollination
+			//so subpop.sample should still be okay?
+		
+		//for (i in seqLen(seeds))
+			//subpop.addCrossed(individual, mate);
+		offspring = sapply(seqLen(seeds), CROSS_SCRIPT);
+		//vectorized set of offpsring positions to ""
+		//offspring.setSpatialPosition(individual.getValue(""));
+		positions = rep(individual.spatialPosition, seeds);
+		positions = positions + rnorm(seeds*2,0,D_a/3);
+
+		positions = p1.pointReflected(positions);
+
+		offspring.setSpatialPosition(positions);
 	}
 }		
 species MH reproduction(){
@@ -68,13 +144,21 @@ species MH reproduction(){
 	comp_intra = subpop.individualCount*percap_intra;
 	percap_inter = rnorm(1,a_ma,a_ma_dev);
 	comp_inter = AV.subpopulations.individualCount*percap_inter;
-	competition = comp_intra + comp_inter;	
+	competition = individual.getValue('intra')+individual.getValue('inter');	
+	//competition = comp_intra + comp_inter;	
 	seeds = asInteger(seeds/(1+competition));
 	print(paste("seeds_m",seeds));
 	if (seeds > 0){
 		mate = subpop.sampleIndividuals(1);
-		for (i in seqLen(seeds))
-			subpop.addCrossed(individual, mate);
+		//for (i in seqLen(seeds))
+			//subpop.addCrossed(individual, mate);
+		offspring = sapply(seqLen(seeds), CROSS_SCRIPT);
+		positions = rep(individual.spatialPosition, seeds);
+		positions = positions + rnorm(seeds*2,0,D_m/3);
+
+		positions = p1.pointReflected(positions);
+
+		offspring.setSpatialPosition(positions);
 	}
 }	
 
