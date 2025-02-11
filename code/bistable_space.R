@@ -31,6 +31,7 @@ update_grid <- function(grid, heterogeneity, switch_prob) {
       # Environmental influence
       env_factor <- heterogeneity[i, j] * heterogeneity_strength
       #make heterogeneity litter
+      
       #and species specific HS (influence of litter on rec)
       
       #base switch prob should be low, they dont switch unless theres litter
@@ -90,7 +91,92 @@ image(grid2, main=paste("time=",t))
 }  
 grid = gridlist[[t]]
 
+timesteps <- 10 # Number of simulation steps
+switch_prob <- 0.1  # Base probability of switching states
+grid_size <- 5
+grid <- matrix(sample(c("A", "B"), grid_size^2, replace = TRUE), nrow = grid_size)
+hetero <- array(0, dim=dim(grid))
+HSa <- 0.1
+HSb <- 0.3
 
+# within a timestep
+	#1. make seeds
+		#depends on litter
+	#2. die -> litter
+	#3. seeds mature (recruitment)
+		# depends on litter
 
+for (i in 1:nrow(grid)) {
+    for (j in 1:ncol(grid)) {
+    	env_factorA <- hetero[i, j] * HSa
+    	env_factorB <- hetero[i, j] * HSb
+    	
+    	#make seeds and recruit, dependent on litter
+    	prob_A_to_B <- switch_prob + env_factorB  
+    	#more litter = more av recruitment     	
+    	prob_B_to_A <- switch_prob + env_factorA   
+    	#more litter = more mh seeds   	
+    	#need to add dispersal but more mh seeds probably inflluences switching
+    	
+    	#died, add litter
+		hetero[grid=='A'] <- hetero[grid=='A'] + 0.5
+		hetero[grid=='B'] <- hetero[grid=='B'] + 0.1
+		
+		# Apply state transitions
+      	if (grid[i, j] == "A" && runif(1) < prob_A_to_B) {
+        	new_grid[i, j] <- "B"
+      	} else if (grid[i, j] == "B" && runif(1) < prob_B_to_A) {
+        	new_grid[i, j] <- "A"
+      	}
+  	}
+}
+
+litterdecay <- function(N0,t,thalf){
+	Nt <- N0*(.5)^(t/thalf)
+	return(Nt)
+}
+
+thalfA <- 2
+thalfB <- 0.5
+thalf <- c(thalfB,thalfA)
+t <- 1:20
+N0 <- 1.5
+Nt <- N0*(.5)^(t/thalfA)
+plot(t,Nt)
+grid <- grid=="A"
+mat <- expand.grid(i=1:nrow(grid),j=1:ncol(grid),t=1:timesteps)
+mat$key <- apply(mat,1,paste,collapse='-')
+heterokey <- array(mat$key, dim=c(dim(grid),timesteps))
+hetero <- array(0, dim=c(dim(grid),timesteps))
+Grid <- hetero
+times <- matrix(NA,ncol=timesteps,nrow=nrow(mat))
+rownames(times)<-mat$key
+cbind(mat,times)
+
+for ( t in 1:timesteps){
+	grid <- matrix(sample(c("A", "B"), grid_size^2, replace = TRUE), nrow = grid_size)
+	Grid[,,t] <- grid
+    grid <- grid=="A"
+    
+	for (i in 1:nrow(grid)) {
+    	for (j in 1:ncol(grid)) {
+    		
+    		N0 <- grid[i,j]*.4 + 0.1
+    		times[heterokey[i,j,t],t:timesteps] <- litterdecay(N0,(t:timesteps)-t,thalf[(grid[i,j]+1)])
+    		
+    		hetero[i,j,t] <- hetero[i,j,t] + sum(times[mat$key[mat$i==i & mat$j==j],t][1:t])
+			
+		}
+	}
+}
+t=t+1
+hetero[i,j,t][grid=='A'] <- hetero[grid=='A'] + 0.5
+			hetero[grid=='B'] <- hetero[grid=='B'] + 0.1
+
+#make litter map and just av simulation
+#then just mh simulation
+#litter idenpendent
+
+#need to write down mechanisms of switching
 
 
