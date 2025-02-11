@@ -144,6 +144,8 @@ N0 <- 1.5
 Nt <- N0*(.5)^(t/thalfA)
 plot(t,Nt)
 grid <- grid=="A"
+
+#loop for specifies specific litter accumulation with species species age structured decay
 mat <- expand.grid(i=1:nrow(grid),j=1:ncol(grid),t=1:timesteps)
 mat$key <- apply(mat,1,paste,collapse='-')
 heterokey <- array(mat$key, dim=c(dim(grid),timesteps))
@@ -151,7 +153,7 @@ hetero <- array(0, dim=c(dim(grid),timesteps))
 Grid <- hetero
 times <- matrix(NA,ncol=timesteps,nrow=nrow(mat))
 rownames(times)<-mat$key
-cbind(mat,times)
+#cbind(mat,times)
 
 for ( t in 1:timesteps){
 	grid <- matrix(sample(c("A", "B"), grid_size^2, replace = TRUE), nrow = grid_size)
@@ -169,6 +171,25 @@ for ( t in 1:timesteps){
 		}
 	}
 }
+
+layout(array(1:25, dim=dim(Grid[,,1])))
+par(mar=c(0.2,0.5,0.2,0.5), mgp=c(1.3,0.4,0), tcl=-.2, fg="darkgrey", oma=c(1,3,0,0))
+for (i in 1:nrow(grid)) {
+    for (j in 1:ncol(grid)) {
+		
+		plot(0,type='n',xlim=c(1,timesteps), ylim=c(0,1.5),,xaxt='n', yaxt='n')
+		lines(hetero[i,j,],col="blue")
+		points(hetero[i,j,],pch=Grid[i,j,],col=(Grid[i,j,]=="A")+1)
+		for ( t in 1:timesteps){
+			#lines(colSums(times[mat$key[mat$i==i & mat$j==j],],na.rm=T), col = "blue")
+			lines(times[heterokey[i,j,t],],lty=2, col=(Grid[i,j,t]=="A")+1,lwd=0.8)
+		}
+		if (i==1){axis(2)}
+		if (j==5){axis(1)}
+	}	
+}
+
+
 t=t+1
 hetero[i,j,t][grid=='A'] <- hetero[grid=='A'] + 0.5
 			hetero[grid=='B'] <- hetero[grid=='B'] + 0.1
