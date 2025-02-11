@@ -30,8 +30,21 @@ update_grid <- function(grid, heterogeneity, switch_prob) {
       
       # Environmental influence
       env_factor <- heterogeneity[i, j] * heterogeneity_strength
+      #make heterogeneity litter
+      #and species specific HS (influence of litter on rec)
+      
+      #base switch prob should be low, they dont switch unless theres litter
+      #or is it outcompete prob?
+      #av can outcompete mh in high litter so its still litter
+      
       
       # Probability of switching states
+      # B is favored by env 
+      # env f influences switch from A to B
+      # and help keep B in place
+      # so B is avena
+      # having neighbors with same state helps maintain state?
+      # probably true bc dispersal.
       prob_A_to_B <- switch_prob + env_factor - (num_A / 4) * 0.2
       prob_B_to_A <- switch_prob - env_factor - (num_B / 4) * 0.2
       # Probability of staying the same is runif(1)?
