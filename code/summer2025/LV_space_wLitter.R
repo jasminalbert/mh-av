@@ -23,6 +23,7 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
 	
 	list2env(as.list(litparms), envir=environment())
 	list2env(as.list(dispparms), envir=environment())
+	parms <- list(popparms, litparms, dispparms)
 	
 	#initialize litter structure
 	litter_cohorts <- initialize_litter_cohorts(grid_size)
@@ -53,19 +54,19 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
   		N2 <- disperse2(N2, local_disp=d2, global_disp=gd2)
   		
   		# Litter responses 
-  		r1 <- (total_litter*rho1+1)*r1
-  		r2 <- (total_litter*rho2+1)*r2
-  		g1 <- (total_litter*theta1+1)*g1
-  		g2 <- (total_litter*theta2+1)*g2
+  		r10 <- (total_litter*rho1+1)*r1
+  		r20 <- (total_litter*rho2+1)*r2
+  		g10 <- (total_litter*theta1+1)*g1
+  		g20 <- (total_litter*theta2+1)*g2
   		
   		# Apply Lotka-Volterra competition dynamics
-  		growth1[,,time] <- g1 * r1 * N1 * (1 - alpha11 * N1 - alpha12 * N2)
-  		growth2[,,time] <- g2 * r2 * N2 * (1 - alpha21 * N1 - alpha22 * N2)
+  		growth1[,,time] <- g10 * r10 * N1 * (1 - alpha11 * g10 * N1 - alpha12 * g20 * N2)
+  		growth2[,,time] <- g20 * r20 * N2 * (1 - alpha21 * g10 * N1 - alpha22 * g20 * N2)
   
   		N1 <- N1 + growth1[,,time]
   		N2 <- N2 + growth2[,,time]
 		#print(growth1[,,time])
-		print(N1);print(N2)  
+		#print(N1);print(N2)  
   		# Ensure populations stay non-negative
   		N1[N1 < 0] <- 0
   		N2[N2 < 0] <- 0
@@ -86,57 +87,60 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
   		#image(N1, main = paste0("Species 1",t), col = terrain.colors(100))
   		#image(N2, main = "Species 2", col = terrain.colors(100))
 	}
-return(list(sp1=pop1_array,sp2=pop2_array,litter=lit_array,litco=litter_cohorts))
+return(list(sp1=pop1_array,sp2=pop2_array,litter=lit_array,litco=litter_cohorts,parms=parms))
 
 }
-pop <- list(sp1=pop1_array,sp2=pop2_array,litter=lit_array,litco=litter_cohorts)
-r1 <- 0.1
-r2 <- 0.05
-alpha11<- 0.02
-alpha22<- 0.02
-alpha12<- 0.04
-alpha21<- 0.06
-g1<- 0.5
-g2<- 0.1
-popparms <- c(r1=r1,r2=r2,alpha11=alpha11,alpha22=alpha22, alpha12=alpha12,alpha21=alpha21,g1=g1,g2=g2)
+#pop <- list(sp1=pop1_array,sp2=pop2_array,litter=lit_array,litco=litter_cohorts)
 
+r1 <- 0.25
+r2 <- 0.2# 0.05
+alpha11<- 0.08#0.02
+alpha22<- 0.08#2
+alpha12<- 0.25
+alpha21<- 0.2#6
+g1<- 0.5
+g2<- 0.2#1
+popparms <- c(r1=r1,r2=r2,alpha11=alpha11,alpha22=alpha22, alpha12=alpha12,alpha21=alpha21,g1=g1,g2=g2)
+popparms <- c(r1=r1,r2=r2,alpha11=alpha11,alpha22=alpha22, alpha12=0.06,alpha21=0.06,g1=g1,g2=g2)
 
 l1 <- 0.1
-l2 <- 0.2 #AV's N to litter ratio
-hali1 <- 4 #half life
+l2 <- 0.1#2 #AV's N to litter ratio
+hali1 <- 4#4 #half life
 hali2 <- 0.5
 theta1 <- 0
-theta2 <- 0#0.1#0.6 #AV's germination response to litter
-rho1 <- 0#0.1
+theta2 <- 0.6#0.6 #AV's germination response to litter
+rho1 <- 0.1
 rho2 <- 0 #AV's fecundity response to litter
 litparms <-c(l1=l1,l2=l2,hali1=hali1,hali2=hali2,theta1=theta1,theta2=theta2,rho1=rho1,rho2=rho2)
+litparms <-c(l1=l1,l2=l2,hali1=hali1,hali2=hali2,theta1=0,theta2=0,rho1=0,rho2=0)
 
 d1 <- 0.1
-d2 <- 0.3
-gd1 <- 0.002
+d2 <- 0.1
+gd1 <- 0.001
 gd2 <- 0.001
 dispparms <- c(d1=d1,d2=d2,gd1=gd1,gd2=gd2)
-
-
+dispparms <- c(d1=0,d2=0,gd1=0,gd2=0)
+dispparms <- c(d1=0.0075,d2=0.0075,gd1=0.001,gd2=0.001)
 grid_size <- 5
 timesteps <- 50
-set.seed(33)
-N1 <- matrix(rbeta(grid_size^2,0.2,0.2)*10, nrow = grid_size)
-N2 <- matrix(rbeta(grid_size^2,0.2,0.2)*10, nrow = grid_size)
 
-pop <- runsim(timesteps, N1,N2,popparms,dispparms,litparms)
+#set.seed(333)
+#N2 <- matrix(rbeta(grid_size^2,0.2,0.2)*10, nrow = grid_size)
+#N1 <- matrix(rbeta(grid_size^2,0.2,0.2)*10, nrow = grid_size)
 
-par(mfrow=c(grid_size,grid_size),mar=c(1,1,1,1),mgp=c(1,0.5,0),oma=c(3,1,0,0),fg='gray30')
-maxi <- max(c(max(pop$sp1),max(pop$sp2)),na.rm=T)
-maxi <- round(maxi) + (5-(round(maxi)%%5))
-#maxi = 100
-for(i in 1:grid_size){
-	for (j in 1:grid_size){
-		plot(pop$sp1[i,j,], type='l', ylim=c(0,30),xlim=c(0,timesteps))
-		lines(pop$sp2[i,j,],col=2)
-		lines(pop$litter[i,j,],col="lightgrey")
-		if(pop$sp1[i,j,1]<pop$sp2[i,j,1]){box(col='red3',lty=2)}
-		title(main=paste(i,j,sep='-'), line=-0.5, font.main=1, cex.main=0.5)
-	}
-}
-pop$litter[,,timesteps]
+#pop <- runsim(timesteps, N2,N1,popparms,dispparms,litparms)
+
+#par(mfrow=c(grid_size,grid_size),mar=c(1,1,1,1),mgp=c(1,0.5,0),oma=c(3,1,0,0),fg='gray30')
+# maxi <- max(c(max(pop$sp1),max(pop$sp2)),na.rm=T)
+# maxi <- round(maxi) + (5-(round(maxi)%%5))
+# #maxi = 100
+# for(i in 1:grid_size){
+	# for (j in 1:grid_size){
+		# plot(pop$sp1[i,j,], type='l', ylim=c(0,30),xlim=c(0,timesteps))
+		# lines(pop$sp2[i,j,],col=2)
+		# lines(pop$litter[i,j,],col="lightgrey")
+		# if(pop$sp1[i,j,1]<pop$sp2[i,j,1]){box(col='red3',lty=2)}
+		# title(main=paste(i,j,sep='-'), line=-0.5, font.main=1, cex.main=0.5)
+	# }
+# }
+# #pop$litter[,,timesteps]
