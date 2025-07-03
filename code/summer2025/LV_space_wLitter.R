@@ -63,8 +63,8 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
   		growth1[,,time] <- g10 * r10 * N1 * (1 - alpha11 * g10 * N1 - alpha12 * g20 * N2)
   		growth2[,,time] <- g20 * r20 * N2 * (1 - alpha21 * g10 * N1 - alpha22 * g20 * N2)
   
-  		N1 <- N1 + growth1[,,time]
-  		N2 <- N2 + growth2[,,time]
+  		N1 <- growth1[,,time] #+N1
+  		N2 <- growth2[,,time] #+N2
 		#print(growth1[,,time])
 		#print(N1);print(N2)  
   		# Ensure populations stay non-negative
