@@ -34,7 +34,7 @@ plotcoprob <- function(poplist, new=T){
 	return(cprob)
 }
 
-plotpatches <- function(poplist){
+plotpatches <- function(poplist,ylim=default){
 	gridsizes <- as.numeric(names(poplist))
 	for(grid in gridsizes){
 		grid_size <- grid
@@ -43,10 +43,11 @@ plotpatches <- function(poplist){
 		maxi <- max(c(max(pop$sp1),max(pop$sp2)),na.rm=T)
 		maxi <- round(maxi) + (5-(round(maxi)%%5))
 #maxi = 100
-		ymax <- maxi
+		ymax <- ylim
+		if(ylim=="default"){ymax <- maxi}
 		for(i in 1:grid_size){
 			for (j in 1:grid_size){
-				plot(pop$sp1[i,j,], type='l', ylim=c(0,maxi),xlim=c(0,timesteps),xlab='',ylab='')
+				plot(pop$sp1[i,j,], type='l', ylim=c(0,ymax),xlim=c(0,timesteps),xlab='',ylab='')
 				lines(pop$sp2[i,j,],col=2)
 				lines(pop$litter[i,j,],col="lightgrey")
 				if(pop$sp1[i,j,1]<pop$sp2[i,j,1]){box(col='red3',lty=2)}
@@ -149,15 +150,14 @@ grid_size <- as.numeric(grid)
 		#set.seed(3336)
 N2 <- matrix(N2all[1:grid_size^2], nrow=grid_size)
 N1 <- matrix(N1all[1:grid_size^2], nrow=grid_size)
-		
+timesteps=20
 poplist[[grid]] <- runsim(timesteps, N2,N1,popparms,dispparms,litparms)
-if (seepatches){plotpatches(poplist[grid])}
+if (seepatches){plotpatches(poplist[grid], ylim=100)}
 poplist[[1]]$parms
-for (i in 1:grid_size){
-	for (j in 1:grid_size){
-		
-	}
-}
+
+pdf("finallyPE.pdf")
+plotpatches(poplist[grid])
+dev.off()
 
 #n <- 1
 #grid <- gridsizes[n];n=n+1
