@@ -45,6 +45,7 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
 	decay_result <- decay_litter(litter_cohorts, current_time=1, decay_rate[1], 	decay_rate[2],grid_size) #need these lines here?
     total_litter <- decay_result$litter
     litter_cohorts <- decay_result$updated_cohorts
+    lit_array[,,1] <- total_litter
 	
 	#LV pop sim
 	for (time in 2:timesteps) {
