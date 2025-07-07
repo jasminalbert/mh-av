@@ -55,8 +55,8 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
   		N2 <- disperse2(N2, local_disp=d2, global_disp=gd2)
   		
   		# Litter responses 
-  		r10 <- (total_litter*rho1+1)*r1
-  		r20 <- (total_litter*rho2+1)*r2
+  		r10 <- min((total_litter*rho1+1)*r1,r2*1.5)
+  		r20 <- min((total_litter*rho2+1)*r2,r1*1.5)
   		g10 <- min((total_litter*theta1+1)*g1,1)
   		g20 <- min((total_litter*theta2+1)*g2,1)
   		
