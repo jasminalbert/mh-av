@@ -57,8 +57,8 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
   		# Litter responses 
   		r10 <- (total_litter*rho1+1)*r1
   		r20 <- (total_litter*rho2+1)*r2
-  		g10 <- (total_litter*theta1+1)*g1
-  		g20 <- (total_litter*theta2+1)*g2
+  		g10 <- min((total_litter*theta1+1)*g1,1)
+  		g20 <- min((total_litter*theta2+1)*g2,1)
   		
   		# Apply Lotka-Volterra competition dynamics
   		growth1[,,time] <- g10 * r10 * N1 * (1 - alpha11 * g10 * N1 - alpha12 * g20 * N2)
