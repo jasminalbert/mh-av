@@ -35,6 +35,10 @@ plotcoprob <- function(poplist, new=T){
 }
 
 plotpatches <- function(poplist,ylim=default){
+	parms <- poplist[[1]]$parms
+	pop.ptxt <- paste(names(parms[[1]]),parms[[1]],sep="=",collapse=" ")
+	lit.ptxt <- paste(names(parms[[2]]),parms[[2]],sep="=",collapse=" ")
+	disp.ptxt <- paste(names(parms[[3]]),parms[[3]],sep="=",collapse=" ")
 	gridsizes <- as.numeric(names(poplist))
 	for(grid in gridsizes){
 		grid_size <- grid
@@ -57,6 +61,9 @@ plotpatches <- function(poplist,ylim=default){
 				text(rep(c(.15,1),2)*timesteps,y=c(pop1d,pop2d)+maxi*.07, labels=round(c(pop1d,pop2d),2),adj=1,col=rep(1:2,each=2), cex=0.7)
 			}
 		}	
+		mtext(pop.ptxt,outer=T,side=1,line=0.3,cex=0.5,adj=0)
+		mtext(lit.ptxt,outer=T,side=1,line=0.8,cex=0.5,adj=0)
+		mtext(disp.ptxt,outer=T,side=1,line=1.3,cex=0.5,adj=0)
 	}
 }
 
@@ -65,7 +72,7 @@ nsims <- 100
 nsims <- 20
 simslist <- list()
 gridsizes <- 1:10
-gridsizes=5
+gridsizes=2
 gridnames <- as.character(gridsizes)
 cprobmat <- array(dim=c(nsims,length(gridsizes)))
 set.seed(3336)
@@ -144,16 +151,17 @@ names(poplist) <- gridnames
 N2all <- rbeta(max(gridsizes)^2,0.2,0.2)*10
 N1all <- rbeta(max(gridsizes)^2,0.2,0.2)*10
 	
-
+grid <- gridnames
 grid_size <- as.numeric(grid)
 	
 		#set.seed(3336)
 N2 <- matrix(N2all[1:grid_size^2], nrow=grid_size)
 N1 <- matrix(N1all[1:grid_size^2], nrow=grid_size)
-timesteps=20
-poplist[[grid]] <- runsim(timesteps, N2,N1,popparms,dispparms,litparms)
-if (seepatches){plotpatches(poplist[grid], ylim=100)}
-poplist[[1]]$parms
+N1 <- matrix(c(100,5,10,80),nrow=grid_size)
+N2 <- matrix(c(5,100,80,10),nrow=grid_size)
+timesteps=100
+poplist[[grid]] <- runsim(timesteps, N1,N2,popparms,dispparms,litparms)
+if (seepatches){plotpatches(poplist[grid], ylim=200)};poplist[[1]]$parms
 
 pdf("finallyPE.pdf")
 plotpatches(poplist[grid])
