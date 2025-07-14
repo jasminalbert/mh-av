@@ -53,6 +53,7 @@ decay_litter <- function(litter_cohorts, current_time, decay_rate1, decay_rate2,
       idx <- ij_to_index(i, j, grid_size)
       cohorts <- litter_cohorts[[idx]]
       updated_cohorts <- matrix(nrow=0,ncol=2)
+      if (nrow(cohorts)>0){
       for (c in 1:nrow(cohorts)) {
         age <- current_time - cohorts[c,]$birth_time
         remaining1 <- cohorts[c,]$amount1 * exp(-decay_rate1 * age)
@@ -61,6 +62,7 @@ decay_litter <- function(litter_cohorts, current_time, decay_rate1, decay_rate2,
           updated_cohorts <- rbind(updated_cohorts, cohorts[c,])  # Keep original birth_time
         }
         total_litter[i, j] <- total_litter[i, j] + remaining1+remaining2
+      }
       }
       litter_cohorts[[idx]] <- updated_cohorts
     }
