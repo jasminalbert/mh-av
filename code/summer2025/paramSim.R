@@ -1,13 +1,26 @@
 #popparms
+# r1 <- 1:5
+# r2 <- 5#1:5
+# alpha11<- seq(0.01,0.05,0.01)
+# alpha22<- alpha11
+# alpha12<- 0.03
+# alpha21<- seq(0.02,0.06,0.01)
+# g1<- 0.5
+# g2<- seq(0.1,0.5,0.1)
+# popparmdf <- expand.grid(r1=r1,r2=r2,alpha11=alpha11,alpha22=alpha22, alpha12=alpha12, alpha21=alpha21, g1=g1,g2=g2)
+
+
 r1 <- 1:5
 r2 <- 5#1:5
-alpha11<- seq(0.01,0.05,0.01)
-alpha22<- alpha11
+alpha11<- 0.01
+alpha22<- 0.01
 alpha12<- 0.03
-alpha21<- seq(0.02,0.06,0.01)
+alpha21<- seq(0.02,0.04,0.005)
 g1<- 0.5
-g2<- seq(0.1,0.5,0.1)
+g2<- 0.1
 popparmdf <- expand.grid(r1=r1,r2=r2,alpha11=alpha11,alpha22=alpha22, alpha12=alpha12, alpha21=alpha21, g1=g1,g2=g2)
+
+
 
 #litparms
 l1 <- seq(0.01,0.1,length.out=5)
@@ -15,19 +28,24 @@ l2 <- l1 #AV's N to litter ratio
 hali1 <- seq(0.5,4,length.out=4)#4 #half life
 hali2 <- (1:3)/2
 theta1 <- 0
-theta2 <- seq(0.1,0.5,0.1) #AV's germination response to litter
-rho1 <- seq(0.01,0.1,length.out=5)
+theta2 <- seq(0.3,0.5,0.1) #AV's germination response to litter
+rho1 <- seq(0.01,0.03,length.out=3)
 rho2 <- 0 #AV's fecundity response to litter
 #dispparms
-d1 <- seq(0.1,0.5,0.1)
+d1 <- seq(0.01,0.5,length.out=3)
 d2 <- d1
 gd1 <- 0.001
 gd2 <- 0.001
 
-#litparms <- expand.grid(l1=l1,l2=l2, hali1=hali1, hali2=hali2, theta1=theta1, theta2=theta2, rho1=rho1, rho2=rho2)
-#dispparms <- expand.grid(d1=d1, d2=d2, gd1=gd1, gd2=gd2)
-str(popparms)
-str(litparms)
+litparmdf <- expand.grid(l1=l1,l2=l2, hali1=hali1, hali2=hali2, theta1=theta1, theta2=theta2, rho1=rho1, rho2=rho2)
+select <- litparmdf$hali1<litparmdf$hali2
+litparmdf <- litparmdf[!select,]
+litparmdf <- litparmdf[!select2,]
+select2 <- litparmdf$l1>litparmdf$l2
+dispparmdf <- expand.grid(d1=d1, d2=d2, gd1=gd1, gd2=gd2)
+str(popparmdf)
+str(litparmdf)
+str(dispparmdf)
 dispparmdf <- data.frame(t(dispparms))
 litparmdf <- data.frame(t(litparms))
 gridsizes=2
@@ -42,17 +60,25 @@ N1 <- matrix(c(100,5,10,80),nrow=grid_size)
 N2 <- matrix(c(5,100,80,10),nrow=grid_size)
 seepatches=T
 timesteps=20
-pdf("paramsim.pdf")
-for (p in 1:nrow(popparmdf)){
+pdf("paramsim2.pdf")
+for (p in 5:nrow(popparmdf)){
+	pdf(paste0(p,"paramsim_.pdf"))
 	for (l in 1:nrow(litparmdf)){
 		for (d in 1:nrow(dispparmdf)){
 			p.par.i <- unlist(popparmdf[p,])
 			d.par.i <- unlist(dispparmdf[d,])
 			l.par.i <- unlist(litparmdf[l,])
+			cat("\n")
 			poplist[[grid]] <- runsim(timesteps, N1, N2,p.par.i,d.par.i,l.par.i)
-			if (seepatches){plotpatches(poplist[grid], ylim=200)}			
+			cat("\n sim",p,l,d)			
+			#if (seepatches){
+			popsum <- sum(poplist[grid][[1]]$sp1[,,timesteps]*poplist[grid][[1]]$sp2[,,timesteps])
+			if(popsum>1e-16){	
+				plotpatches(poplist[grid], ylim=200)
+				cat("plotted",popsum)}
 		}
 	}
+	dev.off()
 }
 dev.off()
 
@@ -172,6 +198,7 @@ popparmdf[popparmdf$alpha21==0.03 & popparmdf$g2==0.1 & popparmdf$alpha11==0.01,
 #129 - the only one out of 3125 simulations that show coexistence
 #and its exactly the parameters I've been using
 
+#look at sims around those parameters and maybe simulate finer parms
 
 
 
