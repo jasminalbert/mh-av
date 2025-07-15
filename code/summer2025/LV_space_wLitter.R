@@ -40,7 +40,7 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
 	pop2_array[,,1] <- N2
 	
 	# First litter
-	litter_cohorts <- add_litter(litter_cohorts, N1,N2, time_step=1)
+	litter_cohorts <- add_litter(litter_cohorts, N1,N2, time_step=1, l1, l2)
 	#print(litter_cohorts)
 	decay_result <- decay_litter(litter_cohorts, current_time=1, decay_rate[1], 	decay_rate[2],grid_size) #need these lines here?
     total_litter <- decay_result$litter
@@ -74,7 +74,7 @@ runsim <- function(timesteps, N1, N2, popparms, dispparms, litparms){
   
   		
   		# Track litter
-  		litter_cohorts <- add_litter(litter_cohorts, N1,N2, time_step=time)
+  		litter_cohorts <- add_litter(litter_cohorts, N1,N2, time_step=time, l1, l2)
 		decay_result <- decay_litter(litter_cohorts, current_time=time, decay_rate[1], 	decay_rate[2],grid_size) 
     	total_litter <- decay_result$litter
     	litter_cohorts <- decay_result$updated_cohorts
@@ -110,7 +110,7 @@ hali1 <- 4#4 #half life
 hali2 <- 0.5
 theta1 <- 0
 theta2 <- 0.6#0.6 #AV's germination response to litter
-rho1 <- 0.1
+rho1 <- 0.05
 rho2 <- 0 #AV's fecundity response to litter
 litparms <-c(l1=l1,l2=l2,hali1=hali1,hali2=hali2,theta1=theta1,theta2=theta2,rho1=rho1,rho2=rho2)
 litparms <-c(l1=l1,l2=l2,hali1=hali1,hali2=hali2,theta1=0,theta2=0,rho1=0,rho2=0)

@@ -24,10 +24,10 @@ initialize_litter_cohorts <- function(grid_size) {
 }
 
 # Add litter cohort
-add_litter <- function(litter_cohorts, N1, N2, time_step) {
-  new_litter1 <- 0.1*N1
+add_litter <- function(litter_cohorts, N1, N2, time_step, l1, l2) {
+  new_litter1 <- l1*N1
   #print(new_litter1)
-  new_litter2 <- 0.2*N2
+  new_litter2 <- l2*N2
   #print(new_litter2)
   new_litter <- new_litter1+new_litter2
   #print(new_litter)
