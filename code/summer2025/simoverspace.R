@@ -36,6 +36,7 @@ plotcoprob <- function(poplist, new=T){
 
 plotpatches <- function(poplist,ylim=default){
 	parms <- poplist[[1]]$parms
+	parms <- lapply(parms, round,4)
 	pop.ptxt <- paste(names(parms[[1]]),parms[[1]],sep="=",collapse=" ")
 	lit.ptxt <- paste(names(parms[[2]]),parms[[2]],sep="=",collapse=" ")
 	disp.ptxt <- paste(names(parms[[3]]),parms[[3]],sep="=",collapse=" ")
@@ -43,7 +44,7 @@ plotpatches <- function(poplist,ylim=default){
 	for(grid in gridsizes){
 		grid_size <- grid
 		pop <- poplist[[as.character(grid)]]
-		par(mfrow=c(grid_size,grid_size),mar=c(1,1,1,1), mgp=c(1,0.5,0),oma=c(3,1,0,0),fg='gray30')
+		par(mfrow=c(grid_size,grid_size),mar=c(1,1,1,1), mgp=c(1,0.5,0),oma=c(1,1,5,0),fg='gray30')
 		maxi <- max(c(max(pop$sp1),max(pop$sp2)),na.rm=T)
 		maxi <- round(maxi) + (5-(round(maxi)%%5))
 #maxi = 100
@@ -61,9 +62,15 @@ plotpatches <- function(poplist,ylim=default){
 				text(rep(c(.15,1),2)*timesteps,y=c(pop1d,pop2d)+maxi*.07, labels=round(c(pop1d,pop2d),2),adj=1,col=rep(1:2,each=2), cex=0.7)
 			}
 		}	
-		mtext(pop.ptxt,outer=T,side=1,line=0.3,cex=0.5,adj=0)
-		mtext(lit.ptxt,outer=T,side=1,line=0.8,cex=0.5,adj=0)
-		mtext(disp.ptxt,outer=T,side=1,line=1.3,cex=0.5,adj=0)
+		cex <- 1.2
+		mtext(names(parms[[1]]),outer=T, side=3, line=3.3, cex=cex,at=((0:7)/11)+0.01, xpd=NA,col='darkblue')
+		mtext(parms[[1]],outer=T,side=3,line=2.2,cex=cex, at=((0:7)/11)+0.01,xpd=NA)
+		mtext(names(parms[[2]]),outer=T,side=3,line=0.9, cex=cex, at=((0:7)/11)+0.01, xpd=NA, col='darkred')
+		mtext(parms[[2]],outer=T,side=3,line=-0.4,cex=cex, at=((0:7)/11)+0.01, xpd=NA)
+		mtext(names(parms[[3]]),outer=T, side=3,line=2.2, cex=cex, at=((8:11)/12)+0.05, xpd=NA, col='darkgreen')
+		mtext(parms[[3]],outer=T,side=3,line=1.1,cex=cex, at=((8:11)/12)+0.05,xpd=NA)
+		#mtext(lit.ptxt,outer=T,side=1,line=0.8,cex=0.5,adj=0)
+		#mtext(disp.ptxt,outer=T,side=1,line=1.3,cex=0.5,adj=0)
 	}
 }
 
