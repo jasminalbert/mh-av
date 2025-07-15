@@ -60,9 +60,11 @@ N1 <- matrix(c(100,5,10,80),nrow=grid_size)
 N2 <- matrix(c(5,100,80,10),nrow=grid_size)
 seepatches=T
 timesteps=20
+
 pdf("paramsim2.pdf")
 for (p in 5:nrow(popparmdf)){
 	pdf(paste0(p,"paramsim_.pdf"))
+	parmlist <- list()
 	for (l in 1:nrow(litparmdf)){
 		for (d in 1:nrow(dispparmdf)){
 			p.par.i <- unlist(popparmdf[p,])
@@ -80,12 +82,14 @@ for (p in 5:nrow(popparmdf)){
 			if(popsum>0.5){	
 				plotpatches(poplist[grid], ylim=200)
 				cat("plotted",popsum)}
+				parmlist <- append(parmlist,list(list(pop=p.par.i,lit=l.par.i, dis=d.par.i)))
 		}
 	}
+	saveRDS(parmlist,paste0(p,"parmlist.RDS"))
 	dev.off()
 }
 dev.off()
-
+#readRDS(paste0(p,"parmlist.RDS"))
 #immediatelty crashed or no growth at all
 	#2526-3125 g1=g2=0.5 & alpha22>0.01; otherwise sp2 grows when alpha22 is smaller. interesting sp2 can grow is alpha22 small
 2525-3125
