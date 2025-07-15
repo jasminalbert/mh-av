@@ -72,8 +72,12 @@ for (p in 5:nrow(popparmdf)){
 			poplist[[grid]] <- runsim(timesteps, N1, N2,p.par.i,d.par.i,l.par.i)
 			cat("\n sim",p,l,d)			
 			#if (seepatches){
-			popsum <- sum(poplist[grid][[1]]$sp1[,,timesteps]*poplist[grid][[1]]$sp2[,,timesteps])
-			if(popsum>1e-16){	
+			
+			pop1end <- apply(poplist[[grid]]$sp1[,,(timesteps-5):timesteps],c(1,2),max)
+			pop2end <- apply(poplist[[grid]]$sp2[,,(timesteps-5):timesteps],c(1,2),max)
+			popsum <- sum(pop1end*pop2end)	
+			#popsum <- sum(poplist[grid][[1]]$sp1[,,timesteps]*poplist[grid][[1]]$sp2[,,timesteps])
+			if(popsum>0.5){	
 				plotpatches(poplist[grid], ylim=200)
 				cat("plotted",popsum)}
 		}
