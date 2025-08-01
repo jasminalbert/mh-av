@@ -76,9 +76,17 @@ for (t in 2:timesteps){
   #germinants compete to make seeds
   N1seeds <- lambda1*N1*(1-N1-alpha*N2)
   N2seeds <- lambda2*N2*(1-N2-beta*N1)
+  #litter
+  N1litter <- N1
+  N2litter <- 0.3 * N2
+  litter <- N1litter+N2litter
   #how these seeds turn into germinants is determined by diffusion
   diff1 <- D*(sum(N1seeds)-N1seeds-N1seeds) #works for 1x2 but will have to change
   diff2 <- D*(sum(N2seeds)-N2seeds-N2seeds)
+  diff1 <- D*(sum(litter)-litter-litter) #works for 1x2 but will have to change
+  diff2 <- D*(sum(litter)-litter-litter)
+  #sp1 germinant diffusion does not depend on litter
+  #do we let it be random then?
   N1 <- N1seeds + diff1
   N2 <- N2seeds + diff2
   
