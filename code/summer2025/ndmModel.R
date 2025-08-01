@@ -58,24 +58,24 @@ vecField <- function(x_vals,y_vals){
   grid$dyn <- grid$dy / mag
   
   eq <- equils()
-  par(mgp=c(2,0.1,0), tcl=-0.3)
+  par(mgp=c(2,0.1,0), tcl=-0.3,xpd=NA)
   plot(isocline_x(y_vals),y_vals,type='n', 
        xlim=range(x_vals),ylim=range(x_vals),
        xlab="N1",ylab="N2")
   arrows(x0=grid$x, y0=grid$y, x1=grid$dxn*0.05+grid$x, 
          y1=grid$dyn*0.05+grid$y, length=0.03, lwd=0.5)
-  lines(x_vals,isocline_y(x_vals), col=2,lty=2)
-  lines(isocline_x(y_vals),y_vals, col=3,lty=2)
+  lines(x_vals,isocline_y(x_vals), col=2,lty=2,xpd=T)
+  lines(isocline_x(y_vals),y_vals, col=3,lty=2,xpd=T)
   #xstar label
   points(eq['xstary0'],0)
-  segments(x0=eq['xstary0'],y0=yran[1],y1=yran[1]-yran[2]*.06,xpd=NA)
+  segments(x0=eq['xstary0'],y0=yran[1],y1=yran[1]-yran[2]*.06)
   labelx <- bquote(.(round(eq['xstary0'],2)) == 1-frac(1,lambda[1]))
-  text(x=eq['xstary0'],y=yran[1]-yran[2]*0.15,labels=labelx, xpd=NA, cex=0.8, adj=0.9)
+  text(x=eq['xstary0'],y=yran[1]-yran[2]*0.15,labels=labelx, cex=0.8, adj=0.9)
   #ystar label
   points(0,eq['ystarx0'])
-  segments(y0=eq['ystarx0'],x0=xran[1],x1=xran[1]-xran[2]*.06,xpd=NA)
+  segments(y0=eq['ystarx0'],x0=xran[1],x1=xran[1]-xran[2]*.06)
   labely <- bquote(.(round(eq['ystarx0'],2)) == 1-frac(1,lambda[2]))
-  text(y=eq['ystarx0'],x=xran[1]-xran[2]*0.15,labels=labely, xpd=NA, cex=0.8, adj=0.7)
+  text(y=eq['ystarx0'],x=xran[1]-xran[2]*0.15,labels=labely,cex=0.8, adj=0.7)
   #title
   parnames <- c("lambda1","lambda2","alpha","beta")
   pars <- c(lambda1,lambda2,beta12,beta21)
@@ -83,14 +83,19 @@ vecField <- function(x_vals,y_vals){
         font.main=1, cex.main=0.8, line=0.1)
   #coexistence star label
   points(equils()["xstar"],equils()["ystar"],pch=8,col=4)
-  points(xran[1],yran[1]-yran[2]*0.2,pch=8, xpd=NA,col=4)
+  points(xran[1],yran[1]-yran[2]*0.2,pch=8,col=4)
   text(xran[2]*0.12,yran[1]-yran[2]*0.2, 
        labels=bquote( "("* .(round(eq['xstar'],2))*","*
-        .(round(eq['ystar'],2))*")" ),xpd=NA, cex=0.8)
+        .(round(eq['ystar'],2))*")" ), cex=0.8)
 }
 x_vals <- seq(0, 0.8, length.out = 20)
 y_vals <- seq(0, 0.8, length.out = 20)
 x_vals <- seq(0, 0.4, length.out = 20)
 y_vals <- seq(0, 0.4, length.out = 20)
+par(mfrow=c(1,2),mar=c(2,1,1,1),oma=c(2,2,0,0))
 vecField(x_vals,y_vals)
 
+lambda1 <- 2 #cannot <=1
+lambda2 <- 2
+beta12  <- 1.2
+beta21  <- 1.2
