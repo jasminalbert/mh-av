@@ -77,3 +77,47 @@ toroidal_pad <- function(mat) {
 #test_out2 <- disperse1(test_mat,rate=0.1)
 #sum(test_mat);sum(test_out2)
 #test_mat=test_out2
+
+
+disperse_gaussian <- function(mat, sigma = 1) {
+  # Create 3x3 Gaussian kernel centered at (0,0)
+  dx <- -1:1
+  dy <- -1:1
+  kernel <- outer(dx, dy, function(x, y) exp(-(x^2 + y^2) / (2 * sigma^2)))
+  kernel <- kernel / sum(kernel)  # Normalize
+  
+  # Pad the matrix with zeros (no wraparound)
+  padded <- matrix(0, nrow = nrow(mat) + 2, ncol = ncol(mat) + 2)
+  padded[2:(nrow(mat)+1), 2:(ncol(mat)+1)] <- mat
+  
+  # Create output matrix
+  result <- matrix(0, nrow = nrow(mat), ncol = ncol(mat))
+  
+  # Apply the kernel to each cell
+  for (i in 1:nrow(mat)) {
+    for (j in 1:ncol(mat)) {
+      neighborhood <- padded[i:(i+2), j:(j+2)]
+      result[i, j] <- sum(kernel * neighborhood)
+    }
+  }
+  
+  return(result)
+}
+
+simpleDisperse <- function(D){
+  normal <- matrix(rnorm(gridsize^2),ncol=gridsize)
+  normal <- normal/sum((normal))
+  id <- (1/normal*0.5)*(abs(normal))
+  sum(normal+id)
+}
+ld <- litDif(matrix(abs(rnorm(gridsize^2)),ncol=gridsize))
+ldn <- ld/(sum(abs(ld)))
+sum(ldn)
+seedslit=seedslit[,,5]
+litdifnorm
+sd1<-seedslit-0.3*litdifnorm
+sd2<-seedslit-0.3*ldn
+sum(seedslit)
+sum(abs(sd1-seedslit))
+sum(abs(sd2-seedslit))
+sum(litdif)
