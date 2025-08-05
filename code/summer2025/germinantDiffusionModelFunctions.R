@@ -103,7 +103,106 @@ for (i in 1){#edit for generalizing gridsize
 
 
 
+lambda1 <- 1.7
+lambda2 <- 1.5
+alpha <- 0.4
+beta <- 0.55
+D <- 0.3 #diffusion coefficient
+N1 <- matrix(c(0.8,0.1),ncol=2)
+N2 <- matrix(c(0.1,0.8),ncol=2)
+sp1array <- array(NA,dim=c(dim(N1),timesteps))
+sp2array <- sp1array
+sp1array[,,1] <- N1; sp2array[,,1] <- N2 #germinants at time 1
+for (t in 2:timesteps){
+  #germinants compete to make seeds
+  N1seeds <- lambda1*N1*(1-N1-alpha*N2)
+  N2seeds <- lambda2*N2*(1-N2-beta*N1)
+  #litter
+  N1litter <- N1
+  N2litter <- 0.3 * N2
+  litter <- N1litter+N2litter
+  #how these seeds turn into germinants is determined by diffusion
+  diff1 <- D*(sum(N1seeds)-N1seeds-N1seeds) #works for 1x2 but will have to change
+  diff2 <- D*(sum(N2seeds)-N2seeds-N2seeds)
+  diff1 <- D*(sum(litter)-litter-litter) #works for 1x2 but will have to change
+  diff2 <- D*(sum(litter)-litter-litter)
+  #sp1 germinant diffusion does not depend on litter
+  #do we let it be random then?
+  N1 <- N1seeds + diff1
+  N2 <- N2seeds + diff2
+  
+  sp1array[,,t] <- N1
+  sp2array[,,t] <- N2
+}
 
+for (i in 1){#edit for generalizing gridsize
+  for (j in 1:2){
+    plot(1:timesteps,sp1array[i,j,],type='l',ylim=c(0,1))
+    lines(1:timesteps,sp2array[i,j,],col=2)
+  }
+}
+#random dispersal array
+randdisp <- rep(rnorm(gridsize^2),timesteps*2)
+rd_ar <- array(NA,dim=c(gridsize,gridsize,2,timesteps))
+dimnames(rd_ar)<-list(i=1:2,j=1:2,sp=c('sp1','sp2'),t=1:timesteps)
+for(s in dimnames(rd_ar)[[3]]){
+  for (t in 1:timesteps){
+    rd_ar[,,s,t] <- rnorm(gridsize^2)
+  }
+}
+
+#make a loop
+timesteps=10
+gridsize <- 2
+#individuals at time 1
+N1 <- matrix(c(0.8,0.05,0.1,0.7),ncol=gridsize) 
+N2 <- 0.85-N1
+#storage array
+dimnames <- list(i=1:gridsize, j=1:gridsize,stage=c("inds","seeds","dispered"), 
+                 time=1:timesteps)
+sp1 <- array(NA, dim=c(gridsize,gridsize,3,timesteps), dimnames)
+sp2 <- sp1
+sp1[,,"inds",1] <- N1
+sp2[,,"inds",1] <- 0
+sp2[,,"inds",2] <- N2
+#litter
+lit <- sp1[,,1,]
+lit[,,1] <- ifelse(is.na(N1),NA,0)
+
+#no litter models
+sp10 <- sp1; sp20 <- sp2
+
+t=1
+for (t in 1:timesteps){
+  #seed=sample(1:1e6,1)
+  litdif <- litDif(lit[,,t])
+  litdifnorm <- litdif/sum(abs(litdif))
+  lambda1lit <- lambda1*(1-rho*litdif) #no lit at t=1
+  sp1[,,"seeds",t] <- lambda1lit*sp1[,,"inds",t]*(1-sp1[,,"inds",t]-alpha*sp2[,,"inds",t])
+  sp10[,,"seeds",t] <- lambda1*sp10[,,"inds",t]*(1-sp10[,,"inds",t]-alpha*sp20[,,"inds",t])
+  sp2[,,"seeds",t] <- lambda2*sp2[,,"inds",t]*(1-sp2[,,"inds",t]-beta*sp1[,,"inds",t])
+  sp20[,,"seeds",t] <- lambda2*sp20[,,"inds",t]*(1-sp20[,,"inds",t]-beta*sp10[,,"inds",t])
+  #dispersal
+  randis1 <- litDif(rd_ar[,,"sp1",t])
+  randis1 <- randis1/sum(abs(randis1))#sum(randis1)
+  randis2 <- litDif(rd_ar[,,"sp2",t])
+  randis2 <- randis2/sum(abs(randis2))#sum(randis2)
+  sp1[,,"dispered",t] <- sp1[,,"seeds",t]-D*randis1
+  sp10[,,"dispered",t] <- sp10[,,"seeds",t]-D*randis1
+  sp2[,,"dispered",t] <- sp2[,,"seeds",t]-D*litdifnorm
+  sp20[,,"dispered",t] <- sp20[,,"seeds",t]-D*randis2
+  #deposit litter
+  lit1 <- sp1[,,"inds",t]*0.5
+  lit2 <- sp2[,,"inds",t]*0.1
+  lit[,,t+1] <- lit1+lit2
+  #t+1 inds are what dispersed
+  sp1[,,"inds",t+1] <- sp1[,,"dispered",t]
+  sp10[,,"inds",t+1] <- sp10[,,"dispered",t]
+  if (t>1){
+    sp2[,,"inds",t+1] <- sp2[,,"dispered",t]
+    sp20[,,"inds",t+1] <- sp20[,,"dispered",t]
+  }
+}
 
 
 
