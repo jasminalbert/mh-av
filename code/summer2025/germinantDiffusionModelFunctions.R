@@ -245,5 +245,9 @@ dev.off()
 
 parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
 pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D)
-
-
+# some notes
+# dispersal is not dependent on whats there at all..should fix this.
+  #like in 1,1 amount dispersed out in timestep 2 is the same. 
+  #a constant subtraction but should be a fraction
+    #since part of the push mean more seeds -> more disp out
+#what would bigger rho or bigger l1 look like?
