@@ -141,8 +141,11 @@ for (i in 1){#edit for generalizing gridsize
     lines(1:timesteps,sp2array[i,j,],col=2)
   }
 }
-#random dispersal array
-randdisp <- rep(rnorm(gridsize^2),timesteps*2)
+
+####
+timesteps=5
+gridsize <- 2
+#random dispersal array and function
 rd_ar <- array(NA,dim=c(gridsize,gridsize,2,timesteps))
 dimnames(rd_ar)<-list(i=1:2,j=1:2,sp=c('sp1','sp2'),t=1:timesteps)
 for(s in dimnames(rd_ar)[[3]]){
@@ -150,12 +153,26 @@ for(s in dimnames(rd_ar)[[3]]){
     rd_ar[,,s,t] <- rnorm(gridsize^2)
   }
 }
+difdis <- function(rd,seeds){
+  dispin <- rd*seeds
+  dispout=(-rd*seeds)/3
+  dis=array(NA,dim=dim(seeds))
+  for (i in 1:(ncol(seeds)^2)){
+    dis[i] = seeds[i]-sum(dispout[-i]) #whats left after you gave
+    #dis_1[i] = seeds[i]-rd[i]*seeds[i]
+  }
+  res <- dis - dispin
+  return(res)
+}
 l1 <- 0.5;l2<-0.1
 rho <- 0.5
 theta <- 1
+D <- 0.5
+lambda1 <- 1.7
+lambda2 <- 1.5
+alpha <- 0.4
+beta <- 0.55
 #make a loop
-timesteps=10
-gridsize <- 2
 #individuals at time 1
 N1 <- matrix(c(0.8,0.05,0.1,0.7),ncol=gridsize) 
 N2 <- 0.85-N1
@@ -173,7 +190,6 @@ lit[,,1] <- ifelse(is.na(N1),NA,0)
 
 #no litter models
 sp10 <- sp1; sp20 <- sp2
-
 t=1
 for (t in 1:timesteps){
   #seed=sample(1:1e6,1)
@@ -189,10 +205,10 @@ for (t in 1:timesteps){
   randis1 <- randis1/sum(abs(randis1))#sum(randis1)
   randis2 <- litDif(rd_ar[,,"sp2",t])
   randis2 <- randis2/sum(abs(randis2))#sum(randis2)
-  sp1[,,"dispered",t] <- sp1[,,"seeds",t]-D*randis1
-  sp10[,,"dispered",t] <- sp10[,,"seeds",t]-D*randis1
-  sp2[,,"dispered",t] <- sp2[,,"seeds",t]-D*theta*litdifnorm
-  sp20[,,"dispered",t] <- sp20[,,"seeds",t]-D*randis2
+  sp1[,,"dispered",t] <- difdis(randis1*D,sp1[,,"seeds",t])
+  sp10[,,"dispered",t] <- difdis(randis1*D,sp10[,,"seeds",t])
+  sp2[,,"dispered",t] <- difdis(D*theta*litdifnorm, sp2[,,"seeds",t])
+  sp20[,,"dispered",t] <- difdis(randis2*D,sp20[,,"seeds",t])
   #deposit litter
   lit1 <- sp1[,,"inds",t]*l1
   lit2 <- sp2[,,"inds",t]*l2
@@ -205,6 +221,8 @@ for (t in 1:timesteps){
     sp20[,,"inds",t+1] <- sp20[,,"dispered",t]
   }
 }
+parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
+pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D)
 ncol <- 6;alpha_col <- 0.9
 cols1 <- hcl.colors(ncol,"PuBu",alpha_col,rev=F)
 cols2 <- hcl.colors(ncol,"OrRd",alpha_col,rev=F)
@@ -213,7 +231,8 @@ gr <- rgb(0,100/255,0,0.15)
 i=1;j=1
 theta=1
 t=5
-pdf("../../figures/germinantDiffusion.pdf",width=9,height=7.5)
+
+pdf("../../figures/germinantDiffusion__d0.5.pdf",width=9,height=7.5)
 par(mgp=c(2,0.1,0),mfrow=c(2,2),xpd=F,cex=.8,tcl=-.15,oma=c(1,.5,.5,0), mar=c(.8,1.3,.5,0))
 for (i in 1:2){
   for (j in 1:2){
@@ -243,11 +262,18 @@ for (i in 1:2){
 title(main=paste(parms,pnames,sep="=",collapse=" "),outer=T,font.main=1,line=-.3)
 dev.off()
 
-parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
-pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D)
+
 # some notes
 # dispersal is not dependent on whats there at all..should fix this.
   #like in 1,1 amount dispersed out in timestep 2 is the same. 
   #a constant subtraction but should be a fraction
-    #since part of the push mean more seeds -> more disp out
+    #since part of the push mean more seeds -> more disp out 
+      #next day (8/6/25) - think I fixed this with difdis function
+      #check:
+sum(sp1[,,"seeds",2])-sum(sp1[,,"dispered",2])
+sum(sp10[,,"seeds",2])-sum(sp10[,,"dispered",2])
+sp2[,,"seeds",3]-sp2[,,"dispered",3]
+sp20[,,"seeds",3]-sp20[,,"dispered",3]
+  #change litter too to use difdis function
+      #close but different - nice
 #what would bigger rho or bigger l1 look like?
