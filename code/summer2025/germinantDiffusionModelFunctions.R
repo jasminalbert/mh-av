@@ -141,7 +141,16 @@ for (i in 1){#edit for generalizing gridsize
     lines(1:timesteps,sp2array[i,j,],col=2)
   }
 }
+####
 
+ncol <- 6;alpha_col <- 0.9
+cols1 <- hcl.colors(ncol,"PuBu",alpha_col,rev=F)
+cols2 <- hcl.colors(ncol,"OrRd",alpha_col,rev=F)
+col2rgb("darkgreen")
+gr <- rgb(0,100/255,0,0.15)
+i=1;j=1
+theta=1
+t=5
 ####
 timesteps=5
 gridsize <- 2
@@ -164,20 +173,21 @@ difdis <- function(rd,seeds){
   res <- dis - dispin
   res[is.na(res)] <-0
   res1 <- res
-  if (any(res<0)){
+  while (any(res<0)){
     neg <- res[res<0]
     add <- sum(abs(neg))+0.001*length(neg)
     res[!res<0] <- res[!res<0] - add/length(res[!res<0])
-    res[res<0] <- 0.001 
+    res[res==neg] <- 0.001 
+    print(res)
   }
   if(abs(sum(res1)-sum(res))>1e-6){stop("sum(res1)-sum(res))>1e-6")}
   if(abs(sum(res1)-sum(seeds))>1e-6){stop("sum(res1)-sum(seeds))>1e-6")}
   return(res)
 }
+parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
 l1 <- 0.5;l2<-0.1
-rho <- 0.5
-theta <- 1
-D <- 0.8
+rho <- 0.5;theta <- 1
+D <- 1
 lambda1 <- 1.7
 lambda2 <- 1.5
 alpha <- 0.4
@@ -231,20 +241,10 @@ for (t in 1:timesteps){
     sp20[,,"inds",t+1] <- sp20[,,"dispered",t]
   }
 }
-mapply(function(x){x<0}, list(sp1[,,"dispered",],sp10[,,"dispered",],sp2[,,"dispered",],sp20[,,"dispered",] ))
-
-parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
+##mapply(function(x){x<0}, list(sp1[,,"dispered",],sp10[,,"dispered",],sp2[,,"dispered",],sp20[,,"dispered",] ))
+#plot
+pdf("../../figures/germinantDiffusion__d0.5..pdf",width=9,height=7.5)
 pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D)
-ncol <- 6;alpha_col <- 0.9
-cols1 <- hcl.colors(ncol,"PuBu",alpha_col,rev=F)
-cols2 <- hcl.colors(ncol,"OrRd",alpha_col,rev=F)
-col2rgb("darkgreen")
-gr <- rgb(0,100/255,0,0.15)
-i=1;j=1
-theta=1
-t=5
-
-pdf("../../figures/germinantDiffusion__d0.8.pdf",width=9,height=7.5)
 par(mgp=c(2,0.1,0),mfrow=c(2,2),xpd=F,cex=.8,tcl=-.15,oma=c(1,.5,.5,0), mar=c(.8,1.3,.5,0))
 for (i in 1:2){
   for (j in 1:2){
@@ -282,10 +282,10 @@ dev.off()
     #since part of the push mean more seeds -> more disp out 
       #next day (8/6/25) - think I fixed this with difdis function
       #check:
-sum(sp1[,,"seeds",2])-sum(sp1[,,"dispered",2])
-sum(sp10[,,"seeds",2])-sum(sp10[,,"dispered",2])
-sp2[,,"seeds",3]-sp2[,,"dispered",3]
-sp20[,,"seeds",3]-sp20[,,"dispered",3]
+#sum(sp1[,,"seeds",2])-sum(sp1[,,"dispered",2])
+#sum(sp10[,,"seeds",2])-sum(sp10[,,"dispered",2])
+#sp2[,,"seeds",3]-sp2[,,"dispered",3]
+#sp20[,,"seeds",3]-sp20[,,"dispered",3]
   #change litter too to use difdis function
       #close but different - nice
 #what would bigger rho or bigger l1 look like?
