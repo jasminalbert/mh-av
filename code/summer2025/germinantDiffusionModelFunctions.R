@@ -162,12 +162,20 @@ difdis <- function(rd,seeds){
     #dis_1[i] = seeds[i]-rd[i]*seeds[i]
   }
   res <- dis - dispin
+  res1 <- res
+  if (any(res<0)){
+    neg <- res[res<0]
+    add <- sum(abs(neg))+0.01*length(neg)
+    res[!res<0] <- res[!res<0] - add/3
+    res[res<0] <- 0.01 
+  }
+  if(any(res1!=seeds)){stop("res1=seeds")}
   return(res)
 }
 l1 <- 0.5;l2<-0.1
 rho <- 0.5
 theta <- 1
-D <- 0.5
+D <- 0.8
 lambda1 <- 1.7
 lambda2 <- 1.5
 alpha <- 0.4
@@ -221,6 +229,8 @@ for (t in 1:timesteps){
     sp20[,,"inds",t+1] <- sp20[,,"dispered",t]
   }
 }
+mapply(function(x){x<0}, list(sp1[,,"dispered",],sp10[,,"dispered",],sp2[,,"dispered",],sp20[,,"dispered",] ))
+sp1[,,"dispered",],sp10[,,"dispered",],sp2[,,"dispered",],sp20[,,"dispered",] 
 parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
 pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D)
 ncol <- 6;alpha_col <- 0.9
@@ -232,7 +242,7 @@ i=1;j=1
 theta=1
 t=5
 
-pdf("../../figures/germinantDiffusion__d0.5.pdf",width=9,height=7.5)
+pdf("../../figures/germinantDiffusion__d0.8.pdf",width=9,height=7.5)
 par(mgp=c(2,0.1,0),mfrow=c(2,2),xpd=F,cex=.8,tcl=-.15,oma=c(1,.5,.5,0), mar=c(.8,1.3,.5,0))
 for (i in 1:2){
   for (j in 1:2){
