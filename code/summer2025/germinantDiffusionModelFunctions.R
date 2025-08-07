@@ -162,14 +162,16 @@ difdis <- function(rd,seeds){
     #dis_1[i] = seeds[i]-rd[i]*seeds[i]
   }
   res <- dis - dispin
+  res[is.na(res)] <-0
   res1 <- res
   if (any(res<0)){
     neg <- res[res<0]
-    add <- sum(abs(neg))+0.01*length(neg)
-    res[!res<0] <- res[!res<0] - add/3
-    res[res<0] <- 0.01 
+    add <- sum(abs(neg))+0.001*length(neg)
+    res[!res<0] <- res[!res<0] - add/length(res[!res<0])
+    res[res<0] <- 0.001 
   }
-  if(any(res1!=seeds)){stop("res1=seeds")}
+  if(abs(sum(res1)-sum(res))>1e-6){stop("sum(res1)-sum(res))>1e-6")}
+  if(abs(sum(res1)-sum(seeds))>1e-6){stop("sum(res1)-sum(seeds))>1e-6")}
   return(res)
 }
 l1 <- 0.5;l2<-0.1
@@ -202,7 +204,7 @@ t=1
 for (t in 1:timesteps){
   #seed=sample(1:1e6,1)
   litdif <- litDif(lit[,,t])
-  litdifnorm <- litdif/sum(abs(litdif))
+  litdifnorm <- litdif/sum(abs(litdif)) 
   lambda1lit <- lambda1*(1-rho*litdif) #no lit at t=1
   sp1[,,"seeds",t] <- lambda1lit*sp1[,,"inds",t]*(1-sp1[,,"inds",t]-alpha*sp2[,,"inds",t])
   sp10[,,"seeds",t] <- lambda1*sp10[,,"inds",t]*(1-sp10[,,"inds",t]-alpha*sp20[,,"inds",t])
@@ -230,7 +232,7 @@ for (t in 1:timesteps){
   }
 }
 mapply(function(x){x<0}, list(sp1[,,"dispered",],sp10[,,"dispered",],sp2[,,"dispered",],sp20[,,"dispered",] ))
-sp1[,,"dispered",],sp10[,,"dispered",],sp2[,,"dispered",],sp20[,,"dispered",] 
+
 parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
 pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D)
 ncol <- 6;alpha_col <- 0.9
