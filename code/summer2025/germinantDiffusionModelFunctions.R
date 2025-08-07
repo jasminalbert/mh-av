@@ -177,7 +177,7 @@ difdis <- function(rd,seeds){
     neg <- res[res<0]
     add <- sum(abs(neg))+0.001*length(neg)
     res[!res<0] <- res[!res<0] - add/length(res[!res<0])
-    res[res==neg] <- 0.001 
+    res[res%in%neg] <- 0.001 
     print(res)
   }
   if(abs(sum(res1)-sum(res))>1e-6){stop("sum(res1)-sum(res))>1e-6")}
