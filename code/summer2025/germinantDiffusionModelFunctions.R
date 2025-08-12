@@ -152,14 +152,16 @@ i=1;j=1
 theta=1
 t=5
 ####
-timesteps=5
+timesteps=15
 gridsize <- 2
 #random dispersal array and function
 rd_ar <- array(NA,dim=c(gridsize,gridsize,2,timesteps))
 dimnames(rd_ar)<-list(i=1:2,j=1:2,sp=c('sp1','sp2'),t=1:timesteps)
 for(s in dimnames(rd_ar)[[3]]){
   for (t in 1:timesteps){
-    rd_ar[,,s,t] <- rnorm(gridsize^2)
+    #var <- rnorm(gridsize^2,sd=1)
+    #abs(var/max(abs(var))) 
+    rd_ar[,,s,t] <-rbeta(gridsize^2,1.2,1.6)
   }
 }
 difdis <- function(rd,seeds){
@@ -174,32 +176,34 @@ difdis <- function(rd,seeds){
   res[is.na(res)] <-0
   res1 <- res
   while (any(res<0)){
-    neg <- res[res<0]
+    sel <- res<0
+    neg <- res[sel]
     add <- sum(abs(neg))+0.001*length(neg)
     res[!res<0] <- res[!res<0] - add/length(res[!res<0])
-    res[res%in%neg] <- 0.001 
+    res[sel] <- 0.001 
     print(res)
   }
   if(abs(sum(res1)-sum(res))>1e-6){stop("sum(res1)-sum(res))>1e-6")}
   if(abs(sum(res1)-sum(seeds))>1e-6){stop("sum(res1)-sum(seeds))>1e-6")}
   return(res)
-}
+} #no longer want to use. replacement :
+source("./biased_diffuse.R")
 parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
-l1 <- 0.5;l2<-0.1
-rho <- 0.5;theta <- 1
-D <- 1
-lambda1 <- 1.7
-lambda2 <- 1.5
-alpha <- 0.4
-beta <- 0.55
+l1 <- 0.9;l2<-0.1
+rho <- 0.9;theta <- 1
+D <- 0.5
+lambda1 <- 2
+lambda2 <- 2
+alpha <- 0.6
+beta <- 0.3
 #make a loop
 #individuals at time 1
 N1 <- matrix(c(0.8,0.05,0.1,0.7),ncol=gridsize) 
 N2 <- 0.85-N1
 #storage array
 dimnames <- list(i=1:gridsize, j=1:gridsize,stage=c("inds","seeds","dispered"), 
-                 time=1:timesteps)
-sp1 <- array(NA, dim=c(gridsize,gridsize,3,timesteps), dimnames)
+                 time=1:(timesteps+1))
+sp1 <- array(NA, dim=c(gridsize,gridsize,3,timesteps+1), dimnames)
 sp2 <- sp1
 sp1[,,"inds",1] <- N1
 sp2[,,"inds",1] <- 0
@@ -214,21 +218,25 @@ t=1
 for (t in 1:timesteps){
   #seed=sample(1:1e6,1)
   litdif <- litDif(lit[,,t])
-  litdifnorm <- litdif/sum(abs(litdif)) 
-  lambda1lit <- lambda1*(1-rho*litdif) #no lit at t=1
+  #litdifnorm <- litdif/sum(abs(litdif)) 
+  lambda1lit <- lambda1*exp(-litdif*rho)#lambda1*(1-rho*litdif)#ifelse(is.na(litdifnorm),0,litdifnorm)) #no lit at t=1
   sp1[,,"seeds",t] <- lambda1lit*sp1[,,"inds",t]*(1-sp1[,,"inds",t]-alpha*sp2[,,"inds",t])
   sp10[,,"seeds",t] <- lambda1*sp10[,,"inds",t]*(1-sp10[,,"inds",t]-alpha*sp20[,,"inds",t])
   sp2[,,"seeds",t] <- lambda2*sp2[,,"inds",t]*(1-sp2[,,"inds",t]-beta*sp1[,,"inds",t])
   sp20[,,"seeds",t] <- lambda2*sp20[,,"inds",t]*(1-sp20[,,"inds",t]-beta*sp10[,,"inds",t])
+  if (any(mapply(function(x){x[,,"seeds",t]},list(sp1,sp10,sp2,sp20))<0)){print("ZERO!")}
   #dispersal
-  randis1 <- litDif(rd_ar[,,"sp1",t])
-  randis1 <- randis1/sum(abs(randis1))#sum(randis1)
-  randis2 <- litDif(rd_ar[,,"sp2",t])
-  randis2 <- randis2/sum(abs(randis2))#sum(randis2)
-  sp1[,,"dispered",t] <- difdis(randis1*D,sp1[,,"seeds",t])
-  sp10[,,"dispered",t] <- difdis(randis1*D,sp10[,,"seeds",t])
-  sp2[,,"dispered",t] <- difdis(D*theta*litdifnorm, sp2[,,"seeds",t])
-  sp20[,,"dispered",t] <- difdis(randis2*D,sp20[,,"seeds",t])
+  #randis1 <- litDif(rd_ar[,,"sp1",t])
+  #randis1 <- randis1/sum(abs(randis1))#sum(randis1)
+  #randis2 <- litDif(rd_ar[,,"sp2",t])
+  #randis2 <- randis2/sum(abs(randis2))#sum(randis2)
+  #sp1[,,"dispered",t] <- #difdis(randis1*D,sp1[,,"seeds",t])
+  litdif[,] <- rank(-litdif)
+  sp1[,,"dispered",t] <- biased_diffuse(sp1[,,"seeds",t],lit[,,t],D=D,beta=0)$N_new
+  sp10[,,"dispered",t] <- biased_diffuse(sp10[,,"seeds",t],lit[,,t],D=D,beta=0)$N_new
+  sp2[,,"dispered",t] <- biased_diffuse(sp2[,,"seeds",t],litdif,D=D,beta=5)$N_new
+  sp20[,,"dispered",t] <- biased_diffuse(sp20[,,"seeds",t],lit[,,t],D=D,beta=0)$N_new
+  #sp2[,,"dispered",t] <- difdis(D*theta*litdif, sp2[,,"seeds",t])
   #deposit litter
   lit1 <- sp1[,,"inds",t]*l1
   lit2 <- sp2[,,"inds",t]*l2
@@ -241,30 +249,36 @@ for (t in 1:timesteps){
     sp20[,,"inds",t+1] <- sp20[,,"dispered",t]
   }
 }
+litmaxes <- apply(lit[,,-1], 3, function(x) which(x==max(x),T ))
+litmax <- lit
+litmax[,,] <- FALSE
+litmax[cbind(t(litmaxes),colnames(litmaxes))] <- TRUE
+
 ##mapply(function(x){x<0}, list(sp1[,,"dispered",],sp10[,,"dispered",],sp2[,,"dispered",],sp20[,,"dispered",] ))
 #plot
-pdf("../../figures/germinantDiffusion__d0.5..pdf",width=9,height=7.5)
+#pdf("../../figures/germinantDiffusion__d0.5..pdf",width=9,height=7.5)
 pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D)
 par(mgp=c(2,0.1,0),mfrow=c(2,2),xpd=F,cex=.8,tcl=-.15,oma=c(1,.5,.5,0), mar=c(.8,1.3,.5,0))
 for (i in 1:2){
   for (j in 1:2){
     plot(1:t,seq(0,1,length.out=t),type="n",ylab='',xlab='',xlim=c(1,t),
          ylim=c(0,0.8))
-    polygon(x=c(1:t-.3,t*1.02,t*1.02,t:1-.3),y=c(rep(-0.05,6),rev(lit[i,j,])[1],rev(lit[i,j,])),
+    polygon(x=c(1:t-.3,t*1.02,t*1.02,t:1-.3),y=c(rep(-0.05,(t+1)),rev(lit[i,j,1:t])[1],rev(lit[i,j,1:t])),
             col=gr,border=NA)
-    lines(1:t-.3,lit[i,j,],col="darkgreen",type='b',pch=3,cex=0.6,lwd=0.4)
-    lines(1:t+.5,sp1[i,j,"dispered",],type='b',col=cols1[3],lwd=0.5,pch=17)
-    lines(1:t+.5,sp2[i,j,"dispered",],type='b',col=cols2[3],lwd=0.5,pch=17)
-    lines(1:t+.5,sp10[i,j,"dispered",],type='b',col=cols1[3],lwd=0.5,pch=2,lty=3,cex=0.7)
+    lines(1:t-.3,lit[i,j,1:t],col=ifelse(litmax[i,j,1:t],"limegreen","darkgreen"),type='b',pch=ifelse(litmax[i,j,1:t],8,3),
+          cex=ifelse(litmax[i,j,1:t],1.5,0.6),lwd=0.4)
+    lines(1:t+.5,sp1[i,j,"dispered",1:t],type='b',col=cols1[3],lwd=0.5,pch=17)
+    lines(2:t+.5,sp2[i,j,"dispered",2:t],type='b',col=cols2[3],lwd=0.5,pch=17)
+    lines(1:t+.5,sp10[i,j,"dispered",1:t],type='b',col=cols1[3],lwd=0.5,pch=2,lty=3,cex=0.7)
     lines(2:t+.5,sp20[i,j,"dispered",2:t],type='b',col=cols2[3],lwd=0.5,pch=2,lty=3,cex=0.7)
-    lines(sp1[i,j,"inds",],type='b',col=cols1[1])
+    lines(sp1[i,j,"inds",1:t],type='b',col=cols1[1])
     lines(2:t,sp2[i,j,"inds",2:t],type='b',col=cols2[1])
-    lines(sp10[i,j,"inds",],type='b',lty=2,col=cols1[1])
+    lines(sp10[i,j,"inds",1:t],type='b',lty=2,col=cols1[1])
     lines(2:t,sp20[i,j,"inds",2:t],type='b',col=cols2[1],lty=2)
-    points(1:t+.2,sp1[i,j,"seeds",],pch=18,col=cols1[2])
-    points(1:t+.2,sp2[i,j,"seeds",],pch=18,col=cols2[2])
-    points(1:t+.2,sp10[i,j,"seeds",],pch=5,col=cols1[2],cex=0.7)
-    points(1:t+.2,sp20[i,j,"seeds",],pch=5,col=cols2[2],cex=0.7)
+    points(1:t+.2,sp1[i,j,"seeds",1:t],pch=18,col=cols1[2])
+    points(2:t+.2,sp2[i,j,"seeds",2:t],pch=18,col=cols2[2])
+    points(1:t+.2,sp10[i,j,"seeds",1:t],pch=5,col=cols1[2],cex=0.7)
+    points(2:t+.2,sp20[i,j,"seeds",2:t],pch=5,col=cols2[2],cex=0.7)
     
     #legend("topleft", legend=c("sp1","sp1notlit","seedslit","seedsnolit",
 #                               "disp_lit","dispNolit","lit"),col=c(1,"darkred","blue","orange",
@@ -272,10 +286,13 @@ for (i in 1:2){
   }
 }
 title(main=paste(parms,pnames,sep="=",collapse=" "),outer=T,font.main=1,line=-.3)
-dev.off()
+#dev.off()
 
 
 # some notes
+#8/7/25 - why isnt sp2 being sensitive to litter? :(
+
+
 # dispersal is not dependent on whats there at all..should fix this.
   #like in 1,1 amount dispersed out in timestep 2 is the same. 
   #a constant subtraction but should be a fraction
