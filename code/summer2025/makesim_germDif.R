@@ -1,3 +1,4 @@
+#working on (1) burn in monoculture
 #storage array
 dimnames <- list(i=1:gridsize, j=1:gridsize,stage=c("inds","seeds","dispered"), 
                  time=1:(timesteps+1))
@@ -17,22 +18,18 @@ for (t in 1:timesteps){
   #seed=sample(1:1e6,1)
   litdif <- litDif(lit[,,t])
   #litdifnorm <- litdif/sum(abs(litdif)) 
-  lambda1lit <- lambda1*exp(-litdif*rho)#lambda1*(1-rho*litdif)#ifelse(is.na(litdifnorm),0,litdifnorm)) #no lit at t=1
+  lambda1lit <- lambda1*exp(-litdif*rho)#no lit at t=1
   sp1[,,"seeds",t] <- lambda1lit*sp1[,,"inds",t]*(1-sp1[,,"inds",t]-alpha*sp2[,,"inds",t])
   sp10[,,"seeds",t] <- lambda1*sp10[,,"inds",t]*(1-sp10[,,"inds",t]-alpha*sp20[,,"inds",t])
   sp2[,,"seeds",t] <- lambda2*sp2[,,"inds",t]*(1-sp2[,,"inds",t]-beta*sp1[,,"inds",t])
   sp20[,,"seeds",t] <- lambda2*sp20[,,"inds",t]*(1-sp20[,,"inds",t]-beta*sp10[,,"inds",t])
   zero <- mapply(function(x){x[,,"seeds",t]},list(sp1,sp10,sp2,sp20))<0
-  #if (any(zero)){cat("\nZERO!",t)}
+  if (any(zero)){cat("\nZERO!",t)}
   #mapply(function(x){x[,,"seeds",t]},list(sp1,sp10,sp2,sp20))
   if(any(sp1[,,"seeds",t] <0)){sp1[,,"seeds",t][sp1[,,"seeds",t]<0]<-0}
   if(any(sp2[,,"seeds",t] <0)){sp2[,,"seeds",t][sp2[,,"seeds",t]<0]<-0}
   #dispersal
-  #randis1 <- litDif(rd_ar[,,"sp1",t])
-  #randis1 <- randis1/sum(abs(randis1))#sum(randis1)
-  #randis2 <- litDif(rd_ar[,,"sp2",t])
-  #randis2 <- randis2/sum(abs(randis2))#sum(randis2)
-  #sp1[,,"dispered",t] <- #difdis(randis1*D,sp1[,,"seeds",t])
+
   litdif[,] <- rank(-litdif)
   sp1[,,"dispered",t] <- biased_diffuse(sp1[,,"seeds",t],lit[,,t],D=D,beta=0)$N_new
   sp10[,,"dispered",t] <- biased_diffuse(sp10[,,"seeds",t],lit[,,t],D=D,beta=0)$N_new
