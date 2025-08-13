@@ -3,7 +3,7 @@ gridsize <- 2
 parms <- c("lambda1","lambda2","alpha","beta","rho","theta","l1","l2","D")
 l1 <- 0.9;l2<-0.1
 rho <- 0.9;theta <- 1
-D <- 0.5
+D0 <- 0; D1 <- 0.5
 lambda1 <- 2
 lambda2 <- 2
 alpha <- 0.5
