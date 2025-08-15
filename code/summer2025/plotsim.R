@@ -20,11 +20,24 @@ for (i in 1:2){
             col=gr,border=NA)
     lines(1:t-.3,lit[i,j,1:t],col=ifelse(litmax[i,j,1:t],"limegreen","darkgreen"),type='b',pch=ifelse(litmax[i,j,1:t],8,3),
           cex=ifelse(litmax[i,j,1:t],1.5,0.6),lwd=0.4)
+    if(plot_equil==T){
+    	lambda1 <- lambda[i,j,-(t+1)]
+    	points(equils()$xstary0,pch="--",col=cols$'10'[2],cex=2)
+    	points(rep(equils()$ystarx0,t),pch="--",col=cols$'20'[2],cex=2)
+    	points(equils()$xstar,pch="--",col=cols$'1'[1],cex=2)
+    	points(equils()$ystar,pch="--",col=cols$'2'[1],cex=2)
+    }
+    if(plot_zngi==T){
+    	lambda1 <- lambda[i,j,-(t+1)]
+    	points(isocline_y(sp1[i,j,"inds",-(t+1)]),pch="-",col="magenta",cex=2)
+    	points(isocline_x(sp2[i,j,"inds",-(t+1)]),pch="-",col="cyan",cex=2)
+    }
     if(plot_dispersed==T){
     lines(1:t+.5,sp1[i,j,"dispered",1:t],type='b',col=cols$"1"[3],lwd=0.5,pch=17)
     lines(1:t+.5,sp2[i,j,"dispered",1:t],type='b',col=cols$"2"[3],lwd=0.5,pch=17)
     lines(1:t+.5,sp10[i,j,"dispered",1:t],type='b',col=cols$"10"[3],lwd=0.5,pch=2,lty=3,cex=0.7)
     lines(1:t+.5,sp20[i,j,"dispered",1:t],type='b',col=cols$"20"[3],lwd=0.5,pch=2,lty=3,cex=0.7)}
+    
     lines(sp1[i,j,"inds",1:t],type='b',col=cols$"1"[1],cex=.7)
     lines(1:t,sp2[i,j,"inds",1:t],type='b',col=cols$"2"[1],cex=.7)
     lines(sp10[i,j,"inds",1:t],type='b',lty=2,col=cols$"10"[1],cex=.7)

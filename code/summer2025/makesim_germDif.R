@@ -7,6 +7,8 @@ sp1 <- array(NA, dim=c(gridsize,gridsize,3,timesteps+1), dimnames)
 sp2 <- sp1
 #litter
 lit <- sp1[,,1,]
+#saving lambdalit
+lambda <- lit
 #initializing
 sp1[,,"inds",1] <- N10
 sp2[,,"inds",1] <- N20
@@ -26,10 +28,10 @@ for (t in 1:timesteps){
   }
   #no lit at t=1
   litdif <- litDif(lit[,,t])
-  if (LLfun =="logis"){lambda1lit <- logis(-litdif,L=(lambda1-1)*2,k=rho)+1}
-  if (LLfun == "exp"){lambda1lit <- lambda1*exp(-litdif*rho)}
+  if (LLfun =="logis"){lambda1lit <- logis(-litdif,L=(lambda10-1)*2,k=rho)+1}
+  if (LLfun == "exp"){lambda1lit <- lambda10*exp(-litdif*rho)}
   sp1[,,"seeds",t] <- lambda1lit*sp1[,,"inds",t]*(1-sp1[,,"inds",t]-alpha*sp2[,,"inds",t])
-  sp10[,,"seeds",t] <- lambda1*sp10[,,"inds",t]*(1-sp10[,,"inds",t]-alpha*sp20[,,"inds",t])
+  sp10[,,"seeds",t] <- lambda10*sp10[,,"inds",t]*(1-sp10[,,"inds",t]-alpha*sp20[,,"inds",t])
   sp2[,,"seeds",t] <- lambda2*sp2[,,"inds",t]*(1-sp2[,,"inds",t]-beta*sp1[,,"inds",t])
   sp20[,,"seeds",t] <- lambda2*sp20[,,"inds",t]*(1-sp20[,,"inds",t]-beta*sp10[,,"inds",t])
   #zero <- mapply(function(x){x[,,"seeds",t]},list(sp1,sp10,sp2,sp20))<0
@@ -56,6 +58,8 @@ for (t in 1:timesteps){
   sp2[,,"inds",t+1] <- sp2[,,"dispered",t]
   sp20[,,"inds",t+1] <- sp20[,,"dispered",t]
   #}
+  #save lambda
+  lambda[,,t] <- lambda1lit
 }
 litmaxes <- apply(lit[,,-1], 3, function(x) which(x==max(x),T ))
 litmax <- lit
