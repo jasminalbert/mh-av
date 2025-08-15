@@ -71,16 +71,14 @@ biased_diffuse <- function(N, E, D = 0.2, beta = 1, wrap = 0, n_nbs=8) {
   # Inflow from all neighbors
   inflow <- matrix(0, nr, nc)
   for (d in nbrs) {
-  	d=nbrs[[i]]
-    # Abundance at origin
-    N_origin <- shift(N, -d[1], -d[2]);N_origin
+  	# Abundance at origin
+    N_origin <- shift(N, -d[1], -d[2])#;N_origin
     # Sum of weights at origin
-    sumw_origin <- shift(sum_w_origin, -d[1], -d[2]);sumw_origin
+    sumw_origin <- shift(sum_w_origin, -d[1], -d[2])#;sumw_origin
     # 🔹 FIX: avoid NaNs by replacing zeros in per-origin sums
     sumw_origin[sumw_origin == 0] <- 1
     # Add contribution to current cell
-    inflow <- inflow + D * N_origin * (w / sumw_origin);inflow
-    i=i+1
+    inflow <- inflow + D * N_origin * (w / sumw_origin)#;inflow
   }
 
   # remaining residents that didn't disperse

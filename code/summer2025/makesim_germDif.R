@@ -1,13 +1,5 @@
 #working on (1) burn in monoculture
-#L:carry capacity (max lambda)
-#k: logistic growth rate, steepness of curve (rho)
-#x0: x value at functions midpoint (lambdai^0)
-#standard logistic function has L=k=1,x0=0
-logis <-function(x,L=1,k=1,x0=0){
-  denom <- 1+exp(-k * (x-x0))
-  y <- L/denom
-  return(y)
-}
+
 #storage array
 dimnames <- list(i=1:gridsize, j=1:gridsize,stage=c("inds","seeds","dispered"), 
                  time=1:(timesteps+1))
