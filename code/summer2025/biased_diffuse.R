@@ -2,7 +2,7 @@
 
 #N = matrix(c(0.4,0.2,0.05,0.3),ncol=2)
 #E = (1-N)/3
-biased_diffuse <- function(N, E, D = 0.2, beta = 1, wrap = 0, n_nbs=8) {
+biased_diffuse <- function(N, E, D = 0.2, beta = 1, wrap = 0, n_nbs=8, origins=F) {
   stopifnot(is.matrix(N), is.matrix(E), all(dim(N) == dim(E)))
   nr <- nrow(N); nc <- ncol(N)
   
@@ -66,10 +66,18 @@ biased_diffuse <- function(N, E, D = 0.2, beta = 1, wrap = 0, n_nbs=8) {
   
   # contributions to a destination cell from each neighbor origin:
   # for each direction, get N at the origin (i.e., shift N), and denominator is sum_w_origin at that origin
+  if (origins==T){
+  	orgins <- expand.grid(i=1:nr, j=1:nc,nb=1:8)
+	orgins$Nout <- NA
+	orgins$out2_i <- NA 
+	orgins$out2_j <- NA 
+	orgins$dx<-NA;orgins$dy<-NA
+  }
 
   
   # Inflow from all neighbors
   inflow <- matrix(0, nr, nc)
+  nb=1
   for (d in nbrs) {
   	# Abundance at origin
     N_origin <- shift(N, -d[1], -d[2])#;N_origin
@@ -78,14 +86,24 @@ biased_diffuse <- function(N, E, D = 0.2, beta = 1, wrap = 0, n_nbs=8) {
     # 🔹 FIX: avoid NaNs by replacing zeros in per-origin sums
     sumw_origin[sumw_origin == 0] <- 1
     # Add contribution to current cell
-    inflow <- inflow + D * N_origin * (w / sumw_origin)#;inflow
+    inflowd <- D * N_origin * (w / sumw_origin)
+    inflow <- inflow + inflowd
+    if (origins==T & D>0){
+    	dx=-d[1];dy=-d[2]
+    	select_o <- (orgins$i%in%(which(N_origin>0,T)[,1] -dx) & orgins$j%in%(which(N_origin>0,T)[,2] -dy)) 
+    	select_x <- (orgins$i%in%which(N_origin>0,T)[,1] & orgins$j%in%which(N_origin>0,T)[,2]) 
+    	orgins[select_o & orgins$nb==nb,]$Nout<- inflowd[inflowd>0]
+    	orgins[select_o & orgins$nb==nb,c("out2_i","out2_j")] <- orgins[select_x & orgins$nb==nb,c("i","j")] 
+    	orgins$dy[orgins$nb==nb]<-dy; orgins$dx[orgins$nb==nb]<-dx
+    	nb=nb+1
+    }
   }
 
   # remaining residents that didn't disperse
   stay <- (1 - D) * N
   
   N_new <- stay + inflow
-  return(list(E=E,N=N,N_new=N_new,inflow=inflow, stay=stay,w=w))
+  return(list(E=E,N=N,N_new=N_new,inflow=inflow, stay=stay,w=w,origins=orgins))
 }
 
 
