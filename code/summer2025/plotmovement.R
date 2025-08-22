@@ -7,28 +7,62 @@ for(t in 1:timesteps){
 	litdifr[,,t] <- rank(-litdifa[,,t])
 	#sp2[,,"dispered",t] <- biased_diffuse(sp2[,,"seeds",t],litdif,D=D0,beta=5)$N_new
 }
-
 #sp2[,,"dispered",1:5]
-
-timesteps=8
+timesteps=18
 dd <- c(rep(D0,4),rep(D1,timesteps-4))
 y <- seq(0,1,length.out=4)
-
-t=6
-percent<-T;t1<-3
+percent<-F;t1<-10
 source("plotmovementfunction.R")
-pdf("../../figures/movement1.pdf",width=11)
+pdf("../../figures/movementtheta1_long.pdf",width=13)
 par(mfrow=c(1,1),xpd=NA)
-plotmovement()
+plotmovement(sparray=sp2,theta=1,pall="Dark 3",trim=0,w=1)
 dev.off()
 
+percent=F
+pdf("../../figures/movementsp1theta1_long.pdf",width=13)
+par(mfrow=c(1,1),xpd=NA)
+plotmovement(sparray=sp1,theta=0,pall="Dark 3",trim=0,w=1)
+dev.off()
 
+#t=6
 
+v <- hcl.colors(100,"Viridis",rev=T)
+h<-1:100
+plot(y=rep(1,100),x=log(h)/50,type="p",pch=19,col=v,cex=5)#,ylim=c(1,5))
+plot(y=rep(2,100),x=log(h),type="p",pch=19,col=v,cex=5)#,ylim=range(P))
+plot(y=rep(3,100),x=h,type="p",pch=19,col=v,cex=5)#,ylim=range(P))
+#/max(log(h))
+#/max(log(h/5))
+plot(x=log(h/5),type="p",pch=19,col=v,cex=5,ylim=c(-2,10))
+P<-ceiling(out$Pout*100)
+rank(P,T,"min")
+order(P,T,F,"min")
+pv[pv[,2]%in%log(P),1]
+pv <- data.frame(v,round(log(1:100),2))
+pv<-pv[!duplicated(pv[,2]),]
 
+plot(pv[,2],col=pv[,1],pch=19,cex=5)
+Pvec <- c(1,55,88,89,91,100,100);i=1
+P <- seq(1,100,20)
+P=Pvec#[i];i=i+1;P;log(P)
+plot(P,log(P),pch=19,col=pv[pv[,2]%in%round(log(P),1),1][as.factor(P)],cex=5,xlim=c(1,100))
+plot(P,pch=19,col=cols[P],cex=5,xlim=c(1,100))
 
 i=i+1;out <- trackOr(dif);out=out[i,];out
 #if bigger difference, should be closer to x
 points(x=x[1:nrow(out)]+.3,y=out$yhlf+(out$y0-out$y1)/3, pch=15,cex=6,col="white")
+
+# Example: emphasize high-end values
+
+vals <- 1:100
+ncol <- 100
+pal  <- colorRampPalette(c("navy","cyan","yellow","red"))(ncol)
+pal <-v#[-96:-100]
+# Color map with high-end emphasis (power = 2)
+scaled <- stretch_high(vals, power = 3)
+cols   <- pal[1 + floor(scaled*(ncol-1))]
+
+barplot(rep(1, 98), col = cols, border = NA, space = 0, axes = FALSE)
 
 
 yd <- seq(-1,1,1/3)[-4]
