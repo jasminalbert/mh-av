@@ -10,10 +10,10 @@ colnames(cols) <- c(1,2,"10","20")
 #col2rgb("darkgreen")
 gr <- rgb(0,100/255,0,0.15)
 
-pnames <- c(lambda1,lambda2,alpha,beta,rho,theta,l1,l2,D,LLfun)
-par(mgp=c(2,0.1,0),mfrow=c(2,2),xpd=F,cex=.8,tcl=-.15,oma=c(1,.5,.5,0), mar=c(.8,1.3,.5,0))
-for (i in 1:2){
-  for (j in 1:2){
+
+par(mgp=c(2,0.1,0),mfrow=c(gridsize,gridsize),xpd=F,cex=.8,tcl=-.15,oma=c(1,.5,.5,0), mar=c(.8,1.3,.5,0))
+for (i in 1:gridsize){
+  for (j in 1:gridsize){
     plot(1:t,seq(0,1,length.out=t),type="n",ylab='',xlab='',xlim=c(1,t),
          ylim=c(0,0.8))
     polygon(x=c(1:t-.3,t*1.02,t*1.02,t:1-.3),y=c(rep(-0.05,(t+1)),rev(lit[i,j,1:t])[1],rev(lit[i,j,1:t])),
