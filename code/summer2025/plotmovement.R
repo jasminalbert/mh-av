@@ -9,8 +9,9 @@ for(t in 1:timesteps){
 }
 #sp2[,,"dispered",1:5]
 timesteps=18
-dd <- c(rep(D0,4),rep(D1,timesteps-4))
-y <- seq(0,1,length.out=4)
+dd <- rep(D1,timesteps)
+dd[1:(tD-1)] <- 0
+y <- seq(0,1,length.out=gridsize^2)
 percent<-F;t1<-10
 source("plotmovementfunction.R")
 pdf("../../figures/movementtheta1_long.pdf",width=13)
@@ -19,7 +20,7 @@ plotmovement(sparray=sp2,theta=1,pall="Dark 3",trim=0,w=1)
 dev.off()
 
 percent=F
-pdf("../../figures/movementsp1theta1_long.pdf",width=13)
+pdf("../../figures/movsp1theta1grid3.pdf",width=13)
 par(mfrow=c(1,1),xpd=NA)
 plotmovement(sparray=sp1,theta=0,pall="Dark 3",trim=0,w=1)
 dev.off()

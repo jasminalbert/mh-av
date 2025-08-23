@@ -28,15 +28,16 @@ biased_diffuse <- function(N, E, D = 0.2, beta = 1, wrap = 0, n_nbs=8, origins=F
   w <- exp(beta * E)
   # List of neighbor offsets (8 directions)
   nbrs <- list(
-    c(-1,  0), # up
-    c( 1,  0), # down
-    c( 0, -1), # left
-    c( 0,  1), # right
-    c(-1, -1), # up-left
-    c(-1,  1), # up-right
-    c( 1, -1), # down-left
-    c( 1,  1))  # down-right
-  if (n_nbs==4){nbrs<-nbrs[1:4]}
+    up=c(-1,  0), # up
+    down=c( 1,  0), # down
+    left=c( 0, -1), # left
+    right=c( 0,  1), # right
+    upLeft=c(-1, -1), # up-left
+    upRight=c(-1,  1), # up-right
+    downLeft=c( 1, -1), # down-left
+    downRight=c( 1,  1))  # down-right
+  #if (n_nbs==4){nbrs<-nbrs[1:4]}
+  nbrs <- nbrs[1:n_nbs]
 
     # for each origin, compute sum of neighbor weights (denominator for probabilities)  
   # Sum of destination weights for each origin
@@ -66,47 +67,64 @@ biased_diffuse <- function(N, E, D = 0.2, beta = 1, wrap = 0, n_nbs=8, origins=F
   
   # contributions to a destination cell from each neighbor origin:
   # for each direction, get N at the origin (i.e., shift N), and denominator is sum_w_origin at that origin
+  orgins <-NA
   if (origins==T){
-  	orgins <- expand.grid(i=1:nr, j=1:nc,nb=1:8)
+  	orgins <- expand.grid(i=1:nr, j=1:nc)
 	orgins$Nout <- NA
 	orgins$out2_i <- NA 
 	orgins$out2_j <- NA 
 	orgins$dx<-NA;orgins$dy<-NA
+	dimnames <- list(NULL,names(orgins),names(nbrs))
+	orgins <- array(rep(as.matrix(orgins),8),c(dim(orgins),8),dimnames)
   }
 
   
   # Inflow from all neighbors
   inflow <- matrix(0, nr, nc)
+  dirname <- names(nbrs)
+  inflowd <- array(0, c(nr,nc,n_nbs),dimnames=list(i=NULL,j=NULL,dir=dirname))
   nb=1
-  for (d in nbrs) {
-  	# Abundance at origin
-    N_origin <- shift(N, -d[1], -d[2])#;N_origin
+  for (n in 1:n_nbs) {
+  	d <- nbrs[[n]]#;names(d)<-names(nbrs[n])
+  	# Abundance at origin based on directional shift
+  	#up, [1,] is 0 because none is above - so from d (1 is up)
+  	#choose origins for all x based on directional shift
+  	#indexed aat x 
+  	dirname <- list(i=NULL,j=NULL,dir=names(nbrs[n])[1])
+    N_origin <- array(shift(N, -d[1], -d[2]),c(nr,nc,1),dirname)
     # Sum of weights at origin
     sumw_origin <- shift(sum_w_origin, -d[1], -d[2])#;sumw_origin
     # 🔹 FIX: avoid NaNs by replacing zeros in per-origin sums
     sumw_origin[sumw_origin == 0] <- 1
     # Add contribution to current cell
-    inflowd <- D * N_origin * (w / sumw_origin)
-    inflow <- inflow + inflowd
+    inflowd[,,n] <- D * N_origin[,,1] * (w / sumw_origin)
+    inflow <- inflow + inflowd[,,n]
     if (origins==T & D>0){
     	dx=-d[1];dy=-d[2]
-    	select_o <- (orgins$i%in%(which(N_origin>0,T)[,1] -dx) & orgins$j%in%(which(N_origin>0,T)[,2] -dy)) 
-    	select_x <- (orgins$i%in%which(N_origin>0,T)[,1] & orgins$j%in%which(N_origin>0,T)[,2]) 
-    	orgins[select_o & orgins$nb==nb,]$Nout<- inflowd[inflowd>0]
-    	orgins[select_o & orgins$nb==nb,c("out2_i","out2_j")] <- orgins[select_x & orgins$nb==nb,c("i","j")] 
-    	orgins$dy[orgins$nb==nb]<-dy; orgins$dx[orgins$nb==nb]<-dx
-    	nb=nb+1
+    	xy <- matrix(1:nc^2,nc=nc)
+    	fromO<-diag(xy[(which(N_origin>0,T)[,1] -dx),(which(N_origin>0,T)[,2] -dy)])
+    	toX <- diag(xy[which(N_origin>0,T)[,1],which(N_origin>0,T)[,2]])
+    	orgins[fromO,"Nout",n] <-  inflowd[,,n][inflowd[,,n]>0]
+    	orgins[fromO,c("out2_i","out2_j"),n] <- orgins[toX,c("i","j"),n]
+    	orgins[,"dy",n]<-dy; orgins[,"dx",n]<-dx
     }
   }
-
   # remaining residents that didn't disperse
   stay <- (1 - D) * N
-  
+    #check 
+    if(origins==T){
+  if (sum((rowSums(orgins[,"Nout",],na.rm=T)+stay)-N<1e-10)<gridsize^2){
+  	warning("sum out != N-stay")
+  }}
   N_new <- stay + inflow
   return(list(E=E,N=N,N_new=N_new,inflow=inflow, stay=stay,w=w,origins=orgins))
 }
 
 
+    	# select_o <- (orgins$i%in%(which(N_origin>0,T)[,1] -dx) & orgins$j%in%(which(N_origin>0,T)[,2] -dy)) 
+    	# select_x <- (orgins$i%in%which(N_origin>0,T)[,1] & orgins$j%in%which(N_origin>0,T)[,2]) 
+    	# orgins[select_o & orgins$nb==nb,]$Nout<- inflowd[inflowd>0]
+# orgins[select_o & orgins$nb==nb,c("out2_i","out2_j")] <- orgins[select_x & orgins$nb==nb,c("i","j")] 
 # Environment with high quality in top-left
 # E <- matrix(runif(25), nrow=5)
 # E[1,1] <- 5  

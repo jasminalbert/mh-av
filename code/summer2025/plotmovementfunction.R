@@ -1,15 +1,14 @@
 plotmovement <- function(sparray,theta,...){
 	par(mar=c(0.5,5,2,0))
-	plot(3:timesteps,ylim=c(-0.1,1.1),type="n", xlim=c(t1+.3,timesteps), bty="n",xaxt="n", yaxt="n", ylab='', xlab='')
-	x <- rep(t1,4)
+	plot(t1:timesteps,ylim=c(-0.1,1.1),type="n", xlim=c(t1+.3,timesteps), bty="n",xaxt="n", yaxt="n", ylab='', xlab='')
+	x <- rep(t1,gridsize^2)
 	mtext("time=",1,at=t1,line=-.75,adj=1)
 	title(ylab="patch",line=3.75)
-	patchlab <- apply(unique(dif$origin[,c("i","j")]),1, paste,collapse=',')
-	text(x=t1,y=y,paste0("(",patchlab,")"),font=2,adj=1)
 	mtext(paste(parms,pnames,sep="=",collapse=" "), line=0.8, adj=0.95)
 	for (t in t1:timesteps){
 	#x <- rep(t,4)
 		dif <- biased_diffuse(sparray[,,"seeds",t],litdifr[,,t],D=dd[t],beta=theta, origins=T)
+		cat(t)
 		if(dd[t]==0){x <-x+0.3} else {
 			x <-x+1
 			if(dd[t-1]==0){x <-x-0.7}
@@ -23,25 +22,27 @@ plotmovement <- function(sparray,theta,...){
 				mapply(text, x=x[1]+exp(1/abs(out$yd)*.08)/4.25,y=out$yhlf+(out$y0-out$y1)/3, labels=paste(round(out$Pout*100,5),"%"), srt=out$srt2, cex=0.8,col=pcols[Pout])#col="blue"
 			}
 		}
-		points(x,y,pch=21,cex=5, bg=hcl.colors(4, "greens", 0.5, T)[litdifr[,,t-1]])
+		points(x,y,pch=21,cex=5, bg=hcl.colors(gridsize^2, "greens", 0.5, T)[litdifr[,,t-1]])
 		points(x,y,pch=as.character(litdifr[,,t-1]),cex=1.8)
 		text(x,y+0.13, round(sparray[,,"inds",t],3))
 		text(x,y+0.06, round(sparray[,,"seeds",t],3))
 		pal <- colorRampPalette(c("red","grey","green"))(15)
 		scal <- seq(0,1,length.out=15)
-		seedssign <- data.frame(,)
+		seedssign <- data.frame(scal,pal)
 		pal[1 + floor(scal*(15-1))]
 		arrows(x0=x,y0=y+0.11,y1=y+0.076,length=0.06,lwd=1.2,lend=2, col= seedssign[round(c(sparray[,,"seeds",t]/sparray[,,"inds",t])*10),2] )
 		text(x+0.1,y, round(dif$N-dif$stay,3),adj=0)
 		mtext(t,1,at=x,line=-.75)
 	}
+	patchlab <- apply(dif$origin[,c("i","j"),1],1, paste,collapse=',')
+	text(x=t1,y=y,paste0("(",patchlab,")"),font=2,adj=1)
 }
 #text(x=x[f]+.5,y=((y0+y1)*.5)[f], round(na.omit(orgins$Nout),6)[f],srt=90-atan((y1-y0)[f]*0.8)/pi*180-180,cex=1.2)
 	#arrows(x0=x*1.01,y0=orgins$y[1], y1=xy[xy$i==orgins[1,]$out2_i & xy$j==orgins[1,]$out2_j,]$y *.95, x1=x*1.09, length=0.1, lwd=orgins$Nout[1]*2*10^5)
 #plot(1:75,pch=19,col=hcl.colors(75,"Blues 2"),cex=5)
 ij2y <- function(i,j,y){
-	xy <- expand.grid(i=1:nr,j=1:nc)
-	xy <- matrix(1:4,nc=nc)
+	xy <- expand.grid(i=1:gridsize,j=1:gridsize)
+	xy <- matrix(1:gridsize^2,nc=gridsize)
 	z<-diag(xy[i,j])
 	#xy$z <- 1:4
 	#xy$y <- 	y
@@ -53,13 +54,13 @@ ij2y <- function(i,j,y){
 	
 trackOr <- function(dif){
 	orgins <- dif$origins
-	orgins$y <- rep(y,8)
-	orgins$outflowT <- c(dif$N-dif$stay)
-	orgins$pOut <- orgins$outflow[rep(1:4,8)]
-	y0=orgins$y[!is.na(orgins$Nout)]
-	outflowT <- orgins$outflowT[!is.na(orgins$Nout)]
-	y1=c(na.omit(ij2y(orgins$out2_i,orgins$out2_j,y)))
-	out=c(na.omit(orgins$Nout))
+	ynbs <- rep(y,n_nbs)
+	outflowT <- c(dif$N-dif$stay)
+	pOut <- outflowT[rep(1:gridsize^2,n_nbs)]
+	y0=ynbs[!is.na(orgins[,"Nout",])]
+	outflowT <- pOut[!is.na(orgins[,"Nout",])]
+	y1=c(na.omit(ij2y(orgins[,"out2_i",],orgins[,"out2_j",],y)))
+	out=c(na.omit(c(orgins[,"Nout",])))
 	out <- data.frame(y0=y0,y1=y1,out=out,outT=outflowT)
 	out$Pout <- out$out/outflowT
 	out$yd <- yd <- y1-y0
