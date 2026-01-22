@@ -1,0 +1,768 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+%\usepackage{mathrsfs}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\begin{equation}
+\frac{dN_i}{dt} = r_i g_i N_i \left(1 - \alpha_{ii} g_i N_i - \alpha_{ij} g_j N_j \right)\label{LVeq}
+\end{equation}
+
+\begin{equation}
+\frac{dN_1}{dt} = r_1 g_1 N_1 \left(1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 \right)
+\end{equation}
+\begin{equation}
+\frac{dN_2}{dt} = r_2 g_2 N_2 \left(1 - \alpha_{21} g_1 N_1 - \alpha_{22} g_2 N_2 \right)
+\end{equation}
+
+\noindent Find the equilibria of the system.\newline \newline
+Step 1: Set the derivatives to zero \newline
+
+
+
+$\frac{dN_1}{dt} = 0$ if either: \newline
+
+
+\indent \indent $N_1 = 0$, or \newline
+
+
+\indent \indent $1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 = 0$ \newline
+
+
+$\frac{dN_2}{dt} = 0$ if either: \newline
+
+
+\indent \indent $N_2 = 0$, or \newline
+
+
+\indent \indent $1 - \alpha_{21} g_1 N_1 - \alpha_{22} g_2 N_2 = 0$ \newline
+
+
+\noindent Step 2: List all possible equilibria \newline
+
+(1) Trivial Equilibrium \newline
+
+\indent\indent$N_1 = 0$,$\quad N_2 = 0$ \newline
+
+(2) Species 1 Only (Species 2 extinct) \newline
+
+\indent\indent Set $N_2 = 0$, solve: \newline
+
+\indent\indent $1 - \alpha_{11} g_1 N_1 = 0 \Rightarrow N_1^* = \frac{1}{\alpha_{11} g_1}$ \newline
+
+\indent\indent So: $(N_1^*, N_2^*) = \left( \frac{1}{\alpha_{11} g_1},\ 0 \right)$ \newline
+
+(3) Species 2 Only (Species 1 extinct) \newline
+
+\indent\indent Set $N_1 = 0$, solve:\newline
+
+\indent\indent $1 - \alpha_{22} g_2 N_2 = 0 \Rightarrow N_2^* = \frac{1}{\alpha_{22} g_2}$ \newline
+
+\indent\indent So: $(N_1^*, N_2^*) = \left( 0,\ \frac{1}{\alpha_{22} g_2} \right)$\newline
+
+(4) Coexistence Equilibrium\newline
+
+Now solve the system:\newline
+\begin{equation}
+1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 = 0 \label{eq:1} 
+\end{equation}
+\begin{equation}
+1 - \alpha_{21} g_1 N_1 - \alpha_{22} g_2 N_2 = 0 \label{eq:2}
+\end{equation}
+
+\noindent You can solve this as a linear system in $N_1$ and $N_2$:
+
+From eq. \ref{eq:1}: 
+\begin{equation}
+\alpha_{11} g_1 N_1 + \alpha_{12} g_2 N_2 = 1\label{eq:1'}
+\end{equation}
+\indent From eq. \ref{eq:2}:
+\begin{equation}
+\alpha_{21} g_1 N_1 + \alpha_{22} g_2 N_2 = 1\label{eq:2'}
+\end{equation}
+Now solve using linear algebra:
+
+Let’s solve for $N_1$ and $N_2$: \newline
+
+Multiply \ref{eq:1'} by $\alpha_{22}$, and \ref{eq:2'} by $\alpha_{12}$: \newline
+
+\indent\indent$\alpha_{11} \alpha_{22} g_1 N_1 + \alpha_{12} \alpha_{22} g_2 N_2 = \alpha_{22}$ \newline
+
+
+\indent\indent$\alpha_{21} \alpha_{12} g_1 N_1 + \alpha_{12} \alpha_{22} g_2 N_2 = \alpha_{12}$ \newline
+
+
+Now subtract the two: \newline
+
+\indent\indent$(\alpha_{11} \alpha_{22} - \alpha_{21} \alpha_{12}) g_1 N_1 = \alpha_{22} - \alpha_{12}$ \newline
+
+So, $N_1^* = \frac{\alpha_{22} - \alpha_{12}}{g_1 (\alpha_{11} \alpha_{22} - \alpha_{12} \alpha_{21})}$ \newline
+
+Plug into eq. \ref{eq:1'} to solve for $N_2^*$: \newline
+
+\indent\indent$N_2^* = \frac{\alpha_{11} - \alpha_{21}}{g_2 (\alpha_{11} \alpha_{22} - \alpha_{12} \alpha_{21})}$ \newline
+
+Final Answer: Coexistence Equilibrium \newline
+
+\indent\indent$N_1^* = \frac{\alpha_{22} - \alpha_{12}}{g_1 (\alpha_{11} \alpha_{22} - \alpha_{12} \alpha_{21})} \quad,\quad N_2^* = \frac{\alpha_{11} - \alpha_{21}}{g_2 (\alpha_{11} \alpha_{22} - \alpha_{12} \alpha_{21})}$
+
+
+\section{Zero Net Growth Isoclines}
+Computed by setting the population growth of a species to zero, $dN_i/dt=0$, 
+and calculating 
+the population size of the other species. 
+From eq. \ref{LVeq}, 
+\begin{equation}
+0=r_ig_iN_i(1-\alpha_{ii}g_iN_i-\alpha_{ij}g_jN_j)
+\end{equation}
+
+$(1-\alpha_{ii}g_iN_i-\alpha_{ij}g_jN_j)=0$ %N_i zero growth
+
+$\alpha_{ii}g_iN_i=1-\alpha_{ij}g_jN_j$ %N_i when i has zero growth
+
+\begin{equation}
+N_i = \left(\frac{1-\alpha_{ij}g_jN_j}{\alpha_{ii}g_i}\right)
+\end{equation}
+
+%\alpha_{ij}g_jN_j = 1-\alpha_{ii}g_iN_i
+Intercepts of species $i$ isocline are
+
+\noindent$N_i=\frac{1}{\alpha_{ii}g_i}$, when $N_j=0$, and
+
+\noindent$N_j=\frac{1}{\alpha_{ij}g_j}$, when $N_i=0$.
+
+From eq. \ref{LVeq}, 
+\begin{equation}
+0=r_jg_jN_j(1-\alpha_{jj}g_jN_j-\alpha_{ji}g_iN_i)
+\end{equation}
+
+$(1-\alpha_{jj}g_jN_j-\alpha_{ji}g_iN_i)=0$ %zero growth for j
+
+$\alpha_{jj}g_jN_j=1-\alpha_{ji}g_iN_i$ %N_j when j has zero growth
+
+$\alpha_{ji}g_iN_i=1-\alpha_{jj}g_jN_j$ %N_i when j has zero growth
+
+\begin{equation}
+N_j = \left(\frac{1-\alpha_{ji}g_iN_i}{\alpha_{jj}g_j}\right)
+\end{equation}
+
+Intercepts of species $j$ isocline are
+
+\noindent$N_i=\frac{1}{\alpha_{ji}g_i}$, when $N_j=0$, and
+
+\noindent$N_j=\frac{1}{\alpha_{jj}g_j}$, when $N_i=0$.
+
+
+\section*{Do ZNGIs Differ in Discrete-Time Models?}
+
+\textbf{Short Answer:} Yes, the \emph{net zero growth isoclines (ZNGIs)} can differ in form and location in a \textbf{discrete-time} version of the Lotka-Volterra competition model compared to the continuous-time model. This is especially true when growth rates or competition coefficients are large.
+
+\subsection*{1. Continuous-Time Model}
+
+The continuous-time Lotka-Volterra competition model with germination is:
+
+\[
+\frac{dN_1}{dt} = r_1 g_1 N_1 \left(1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 \right)
+\]
+
+Setting growth to zero (\( \frac{dN_1}{dt} = 0 \)), we get:
+
+\[
+1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 = 0
+\Rightarrow
+N_1 = \frac{1 - \alpha_{12} g_2 N_2}{\alpha_{11} g_1}
+\]
+
+This is the ZNGI for species 1, and it does \emph{not} depend on \( r_1 \).
+
+\subsection*{2. Discrete-Time Model}
+
+The discrete-time version of the model is:
+
+\[
+N_{1,t+1} = N_{1,t} \cdot \lambda_1 \cdot g_1 \cdot \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+
+For zero growth, we set:    
+
+\[
+\frac{N_{1,t+1}}{N_{1,t}} = 1
+\Rightarrow
+\lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 \right) = 1
+\]
+
+Solving for the ZNGI:
+
+\[
+1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 = \frac{1}{\lambda_1 g_1}
+\Rightarrow
+\alpha_{11} g_1 N_1 + \alpha_{12} g_2 N_2 = 1 - \frac{1}{\lambda_1 g_1}
+\Rightarrow
+N_1 = \frac{1 - \frac{1}{\lambda_1 g_1} - \alpha_{12} g_2 N_2}{\alpha_{11} g_1}
+\]
+
+This differs from the continuous-time case because it \emph{does} depend on \( \lambda_1 \) (and hence \( r_1 \)).
+
+\subsection*{3. Key Implications}
+
+\begin{itemize}
+  \item In discrete time, species persistence requires \( \lambda_i g_i > 1 \).
+  \item ZNGIs shift depending on \( \lambda \), potentially altering coexistence conditions.
+  \item No ZNGI exists for species \( i \) if \( \lambda_i g_i < 1 \); it declines even without competition.
+\end{itemize}
+
+\subsection*{4. Summary Table}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Feature} & \textbf{Continuous Time} & \textbf{Discrete Time} \\ \midrule
+ZNGI depends on \( r \)? & No & Yes (via \( \lambda \)) \\
+ZNGI linear in \( N_i, N_j \)? & Yes & Yes (but intercept shifts) \\
+Sensitive to extinction risk? & Less so & More so if \( \lambda g < 1 \) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Population simulations should theoretically follow discrete time dynamics 
+but that doesnt seem to be the case. 
+Populations stabalize at equilibria expected under continuous time models.
+
+\section{Dispersal}
+Under priority effects (inter>intra), there is no coexistence. But when a small amount of dispersal
+is allowed populations reach their coexistence equilibrias. 
+
+
+
+\section*{Equilibrium Analysis of the Discrete-Time Lotka-Volterra Competition Model with Germination}
+
+We consider the following model for two competing species with discrete-time dynamics:
+
+\[
+N_{1,t+1} = N_{1,t} \cdot \lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+\[
+N_{2,t+1} = N_{2,t} \cdot \lambda_2 g_2 \left(1 - \alpha_{22} g_2 N_{2,t} - \alpha_{21} g_1 N_{1,t} \right)
+\]
+
+\subsection*{Equilibrium Conditions}
+
+At equilibrium, population sizes do not change from one time step to the next:
+
+\[
+N_{1,t+1} = N_{1,t} = N_1^*, \quad N_{2,t+1} = N_{2,t} = N_2^*
+\]
+
+Dividing both sides of each equation by \( N_i^* \), we get:
+
+\[
+\lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_1^* - \alpha_{12} g_2 N_2^* \right) = 1
+\]
+\[
+\lambda_2 g_2 \left(1 - \alpha_{22} g_2 N_2^* - \alpha_{21} g_1 N_1^* \right) = 1
+\]
+
+\subsection*{Solving the System}
+
+Rewriting the equations:
+
+\[
+\alpha_{11} g_1^2 N_1^* + \alpha_{12} g_1 g_2 N_2^* = 1 - \frac{1}{\lambda_1 g_1}
+\]
+\[
+\alpha_{21} g_1 g_2 N_1^* + \alpha_{22} g_2^2 N_2^* = 1 - \frac{1}{\lambda_2 g_2}
+\]
+
+This is a system of two linear equations in \( N_1^* \) and \( N_2^* \). We can write it in matrix form:
+
+\[
+\begin{bmatrix}
+\alpha_{11} g_1^2 & \alpha_{12} g_1 g_2 \\
+\alpha_{21} g_1 g_2 & \alpha_{22} g_2^2
+\end{bmatrix}
+\begin{bmatrix}
+N_1^* \\
+N_2^*
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 - \frac{1}{\lambda_1 g_1} \\
+1 - \frac{1}{\lambda_2 g_2}
+\end{bmatrix}
+\]
+
+We solve this system using standard linear algebra (e.g., matrix inversion or Cramer's rule) to obtain the equilibrium densities \( N_1^* \) and \( N_2^* \), provided the solution yields non-negative values.
+
+\subsection*{Full Solution for }%\texorpdfstring{$(N_1^*, N_2^*)$}{(N1*, N2*)}}
+
+To solve the equilibrium system:
+
+\[
+\begin{aligned}
+\lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_1^* - \alpha_{12} g_2 N_2^* \right) &= 1 \\
+\lambda_2 g_2 \left(1 - \alpha_{21} g_1 N_1^* - \alpha_{22} g_2 N_2^* \right) &= 1
+\end{aligned}
+\]
+
+We first rewrite the system as:
+
+\[
+\begin{aligned}
+\alpha_{11} g_1^2 N_1^* + \alpha_{12} g_1 g_2 N_2^* &= 1 - \frac{1}{\lambda_1 g_1} \\
+\alpha_{21} g_1 g_2 N_1^* + \alpha_{22} g_2^2 N_2^* &= 1 - \frac{1}{\lambda_2 g_2}
+\end{aligned}
+\]
+
+This is a linear system of the form:
+
+\[
+\begin{bmatrix}
+A & B \\
+C & D
+\end{bmatrix}
+\begin{bmatrix}
+N_1^* \\
+N_2^*
+\end{bmatrix}
+=
+\begin{bmatrix}
+R_1 \\
+R_2
+\end{bmatrix}
+\]
+
+where:
+
+\[
+\begin{aligned}
+A &= \alpha_{11} g_1^2, \quad B = \alpha_{12} g_1 g_2 \\
+C &= \alpha_{21} g_1 g_2, \quad D = \alpha_{22} g_2^2 \\
+R_1 &= 1 - \frac{1}{\lambda_1 g_1}, \quad R_2 = 1 - \frac{1}{\lambda_2 g_2}
+\end{aligned}
+\]
+
+Using Cramer's rule, the solution is:
+
+\[
+N_1^* = \frac{R_1 D - B R_2}{AD - BC}, \qquad
+N_2^* = \frac{A R_2 - R_1 C}{AD - BC}
+\]
+
+Substituting the definitions back in, we get:
+
+\[
+N_1^* = \frac{
+\left(1 - \frac{1}{\lambda_1 g_1}\right) \alpha_{22} g_2^2 - \alpha_{12} g_1 g_2 \left(1 - \frac{1}{\lambda_2 g_2} \right)
+}{
+\alpha_{11} g_1^2 \alpha_{22} g_2^2 - \alpha_{12} \alpha_{21} g_1^2 g_2^2
+}
+\]
+
+\[
+N_2^* = \frac{
+\alpha_{11} g_1^2 \left(1 - \frac{1}{\lambda_2 g_2} \right) - \left(1 - \frac{1}{\lambda_1 g_1} \right) \alpha_{21} g_1 g_2
+}{
+\alpha_{11} g_1^2 \alpha_{22} g_2^2 - \alpha_{12} \alpha_{21} g_1^2 g_2^2
+}
+\]
+
+These expressions provide the exact coexistence equilibrium of the two-species discrete-time competition model, assuming the denominator is non-zero and both values are positive.
+
+\subsection*{Discrete-Time Model Forms: Multiplicative vs. Additive}
+
+In discrete-time population models, there are two common ways to represent dynamics: the \textit{multiplicative} form and the \textit{additive} form. The choice between these reflects both mathematical intent and biological assumptions.
+
+\subsubsection*{1. Multiplicative Form (Geometric Growth)}
+
+This form assumes per capita reproduction is multiplicative, as in:
+
+\[
+N_{t+1} = N_t \cdot \lambda \cdot \text{(competition term)}
+\]
+
+For a two-species competition model with germination, this becomes:
+
+\[
+N_{1,t+1} = N_{1,t} \cdot \lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+
+This form is biologically meaningful for species with seasonal or pulsed reproduction, such as annual plants. It ensures non-negative values for $N_t$ and leads to a clean equilibrium condition:
+\[
+\lambda_i g_i \left(1 - \sum_j \alpha_{ij} g_j N_j^* \right) = 1
+\]
+
+\textbf{Advantages:}
+\begin{itemize}
+  \item Interpretable as discrete reproductive output per individual.
+  \item Well-behaved dynamics with fewer numerical artifacts.
+  \item Matches classical ecological theory (e.g., Chesson, Tilman).
+\end{itemize}
+
+\subsubsection*{2. Additive Form (Euler Approximation of Continuous-Time)}
+
+Alternatively, some models use an additive update, mimicking a forward Euler step of a differential equation:
+
+\[
+N_{t+1} = N_t + r \cdot N_t \cdot \text{(competition term)}
+\]
+
+\[
+N_{1,t+1} = N_{1,t} + r_1 g_1 N_{1,t} \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+
+This form is useful when approximating continuous-time dynamics using discrete steps. However, for large growth rates or time steps, it can produce negative or unstable dynamics.
+
+\textbf{Disadvantages:}
+\begin{itemize}
+  \item Requires small $r$ or time steps to remain stable.
+  \item Can yield negative population sizes.
+  \item Less natural for organisms with distinct reproductive events.
+\end{itemize}
+
+\subsubsection*{Recommendation}
+
+For our purposes—modeling annual plants with seasonal reproduction and priority effects—the \textbf{multiplicative model form} is the more appropriate choice. It better captures the biology of discrete-time, generation-based reproduction and supports tractable equilibrium and invasion analysis consistent with classical competition theory.
+
+\[
+N_{t+1} = N_t \cdot \lambda g (1 - \alpha_{11} g N_1 - \alpha_{12} g N_2)
+\]
+
+We therefore use the multiplicative form throughout this analysis.
+
+\subsection*{Recommended References on Discrete-Time Model Forms}
+
+The choice between multiplicative and additive discrete-time models is well-covered in both theoretical and applied ecological literature. The following references provide guidance on their formulation, interpretation, and use:
+\subsubsection{Foundational and Theoretical}
+\begin{itemize}
+    \item Kot, M. (2001). \textit{Elements of Mathematical Ecology}. Cambridge University Press.  
+    \begin{itemize}
+        \item Chapter 3 provides a clear treatment of discrete-time models, including both multiplicative (geometric) and additive (Euler-approximated) forms. 
+        \item dicusses discrete-time models, especially \textbf{geometric growth} vs 
+        \textbf{logistic-like} updates
+        \item explains when to use Euler approximation vs multiplicative models
+        \item very readable, with examples of both model types
+    \end{itemize}
+
+    \item May, R. M. (1976). Simple mathematical models with very complicated dynamics. \textit{Nature}, \textbf{261}(5560), 459–467.  
+    \begin{itemize}
+        \item A foundational study on the chaotic dynamics of additive logistic growth models.
+        \item THE classic paper on discrete-time population models
+        \item shows chaotic behavior from additive logistic models
+        \item lays groundwork for why \textbf{multiplicative models} are more stable biologically
+    \end{itemize}
+
+    \item Hastings, A. (1997). \textit{Population Biology: Concepts and Models}. Springer.  
+    \begin{itemize}
+        \item Discusses discrete-time population models and their dynamical behavior under different formulations.
+        \item includes both forms and discusses their implications for stability and biological realism
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Ecology and Competition Theory}
+\begin{itemize}
+    \item Tilman, D. (1994). Competition and biodiversity in spatially structured habitats. \textit{Ecology}, \textbf{75}(1), 2–16.  
+    \begin{itemize}
+        \item Uses discrete multiplicative models for plant competition in annual systems.
+        \item justifies them for annual apecies and pulsed recruitment
+    \end{itemize}
+
+    \item Chesson, P. (2000). Mechanisms of maintenance of species diversity. \textit{Annual Review of Ecology and Systematics}, \textbf{31}, 343–366.  
+    \begin{itemize}
+        \item While focused on continuous models, provides theoretical justification for discrete models with pulsed reproduction.
+        \item frames models in a way that supports the use of multiplicative terms when discrete-time structure is assumed
+    \end{itemize}
+
+    \item Armstrong, R. A., \& McGehee, R. (1980). Competitive exclusion. \textit{The American Naturalist}, \textbf{115}(2), 151–170.  
+    \begin{itemize}
+        \item Provides mathematical background on competitive dynamics across both model types.
+        \item discrete vs continuous and geometric vs linear growth
+    \end{itemize}
+\end{itemize}
+\subsubsection{For Annual Plants and Priority Effects}
+\begin{itemize}
+    \item Adler, P. B., HilleRisLambers, J., \& Levine, J. M. (2007). A niche for neutrality. \textit{Ecology Letters}, \textbf{10}(2), 95–104.  
+    \begin{itemize}
+        \item Demonstrates the application of discrete multiplicative models to annual plant communities.
+        \item good ecological interpretation with clear dynamics
+    \end{itemize}
+
+    \item Mordecai, E. A. (2011). Pathogen impacts on plant communities: unifying theory, concepts, and empirical work. \textit{Ecological Monographs}, \textbf{81}(3), 429–441.  
+    \begin{itemize}
+        \item Uses discrete-time models in a realistic annual plant-pathogen context.
+        \item applies multiplicative models to annual grasslands and priority effects
+        \item shows how demographic timing matters
+    \end{itemize}
+
+    \item Ke, P.-J., \& Letten, A. D. (2018). Coexistence theory and the frequency-dependence of priority effects. \textit{Nature Ecology \& Evolution}, \textbf{2}(11), 1691–1695.  
+    \begin{itemize}
+        \item focuses on coexistence and priority effects
+        \item Discusses modeling approaches for priority effects in annual systems.
+        \item discusses modeling choices (though not formal comparison of model forms)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{summary}
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Feature} & \textbf{Continuous Time}  \\ \midrule
+model forms and stability & Kot(2001), Hastings(1997) \\
+Logistic vs geometric growth & May(1976), Kot(2001)\\
+Ecological competition theory & CHesson(2000), Armstrong and McGeehee(1980) \\
+Annual plant modeling & Adler et al(2007), Mordecai(2011), Tilman(1994)\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{trying to get priority effects}
+\section*{Priority Effects in a Discrete-Time Lotka-Volterra Model with Germination and No Seed Survival}
+
+We consider a discrete-time annual plant competition model where individuals germinate, compete, and produce seeds, but no seeds survive if they do not germinate. This yields the following model for species $i$:
+
+\[
+N_i(t+1) = g_i N_i(t) \cdot \lambda_i \left(1 - \alpha_{ii} g_i N_i(t) - \alpha_{ij} g_j N_j(t) \right)
+\]
+
+where:
+\begin{itemize}
+    \item $N_i(t)$ is the total number of seeds of species $i$ at time $t$,
+    \item $g_i$ is the fraction of seeds that germinate each year,
+    \item $\lambda_i$ is the fecundity per germinant in the absence of competition,
+    \item $\alpha_{ii}$ and $\alpha_{ij}$ are the intraspecific and interspecific competition coefficients, respectively.
+\end{itemize}
+
+\subsection*{Conditions for Priority Effects}
+
+Priority effects occur when the outcome of competition depends on initial abundances. Mathematically, this arises when each species is unable to invade the other when rare. For this to occur in the model above, the following conditions must hold:
+
+\[
+\alpha_{ij} > \alpha_{ii} \quad \text{and} \quad \alpha_{ji} > \alpha_{jj}
+\]
+
+That is, interspecific competition must exceed intraspecific competition. Additionally, for the population to persist, the per capita seed production must be sufficient to maintain or grow the population. This requires:
+
+\[
+\lambda_i \left(1 - \alpha_{ii} g_i N_i - \alpha_{ij} g_j N_j \right) \geq \frac{1}{g_i}
+\]
+
+If this condition is not met, populations will decline to extinction regardless of priority effects.
+
+\subsection*{Example Parameterization}
+
+To achieve priority effects, we use the following symmetric parameter set:
+
+\[
+\begin{aligned}
+\lambda_1 &= \lambda_2 = 5 \\
+g_1 &= g_2 = 0.5 \\
+\alpha_{11} &= \alpha_{22} = 0.01 \\
+\alpha_{12} &= \alpha_{21} = 0.03
+\end{aligned}
+\]
+
+This ensures:
+\begin{itemize}
+    \item Interference from the other species is stronger than from conspecifics,
+    \item Germination and fecundity are sufficient to prevent deterministic extinction.
+\end{itemize}
+
+\subsection*{Simulation Results}
+
+We simulate two initial conditions:
+
+\begin{enumerate}
+    \item $N_1(0) = 10$, $N_2(0) = 1$,
+    \item $N_1(0) = 1$, $N_2(0) = 10$.
+\end{enumerate}
+
+In both cases, the initially dominant species excludes the other, indicating the presence of strong priority effects and alternative stable states.
+
+\section*{Rationale for Parameter Choice Producing Priority Effects}
+
+To generate priority effects in a discrete-time Lotka-Volterra competition model with germination and no seed survival, we require two conditions:
+
+\begin{enumerate}
+    \item \textbf{Mutual non-invasibility:} Each species must be unable to invade when rare. This occurs when interspecific competition exceeds intraspecific competition, i.e.,
+    \[
+    \alpha_{ij} > \alpha_{ii}, \quad \alpha_{ji} > \alpha_{jj}.
+    \]
+    This condition ensures that the equilibrium point where both species coexist is unstable, and that initial abundances determine the competitive outcome.
+
+    \item \textbf{Positive growth at moderate densities:} The per capita fecundity of each species must be high enough that populations do not decline to extinction due to competition. For persistence of species $i$ at density $N_i$, the model:
+    \[
+    N_i(t+1) = g_i N_i(t) \cdot \lambda_i \left(1 - \alpha_{ii} g_i N_i(t) - \alpha_{ij} g_j N_j(t) \right)
+    \]
+    requires that:
+    \[
+    \lambda_i \left(1 - \alpha_{ii} g_i N_i - \alpha_{ij} g_j N_j \right) \geq \frac{1}{g_i}
+    \]
+    to prevent deterministic extinction. This means that the net reproductive rate per seed must exceed $1$ after accounting for competition.
+
+\end{enumerate}
+
+\subsection*{Parameter Selection}
+
+We chose the following parameter values:
+\[
+\lambda_1 = \lambda_2 = 5, \quad g_1 = g_2 = 0.5, \quad \alpha_{11} = \alpha_{22} = 0.01, \quad \alpha_{12} = \alpha_{21} = 0.03.
+\]
+
+These satisfy the conditions as follows:
+\begin{itemize}
+    \item The interspecific competition terms ($\alpha_{12}, \alpha_{21} = 0.03$) are greater than the intraspecific terms ($\alpha_{11}, \alpha_{22} = 0.01$), satisfying the condition for mutual non-invasibility and creating the potential for alternative stable states.
+    \item The fecundity $\lambda_i = 5$ is sufficiently high that even at moderate densities, the net growth term remains positive. For example, at $N_i = 10$, $g_i = 0.5$, and $\alpha_{ii} = 0.01$, the competitive reduction term is:
+    \[
+    \lambda_i \left(1 - \alpha_{ii} g_i N_i \right) = 5 \left(1 - 0.01 \cdot 0.5 \cdot 10 \right) = 5(1 - 0.05) = 4.75,
+    \]
+    which is much greater than $1 / g_i = 2$. Thus, population replacement is ensured under these conditions.
+\end{itemize}
+
+Together, these parameters produce a system with bistability: whichever species starts at higher abundance will competitively exclude the other, a hallmark of strong priority effects.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{finallyPE.pdf}
+\caption{Population simulation using the above parameters. No dispersal or litter feedbacks.}  \label{fig:fig1}
+\end{figure}
+
+\section{How to switch}
+\subsection{Only theta2 turned on}
+Finding that N2 still stays at zero even when litter is high in medusahead patches.
+We need $g_2r_2N_2(1-\alpha_{22}g_2N_2-\alpha_{21}g_1N_1) > 0$. So,
+\[
+1 > \alpha_{22}g_2N_2+\alpha_{21}g_1N_1 
+\]
+
+\[
+\frac{1 - \alpha_{21}g_1N_1}{\alpha_{22}N_2} > g_2
+\]
+
+Will turning up dispersal get N1 equil to lower for this inequality to be true?
+
+I should work out the math for equilibriums with dispersal. 
+
+I think AV inter should be stronger than MH so that it can take over 
+even when MH is making more seeds in its patch and not dispersing too much.
+
+\section{Litter equations}
+
+\[
+L_{t+1} = N_{1,t}*l_1 + N_{2,t}*l_2 
+\]
+\subsection*{Equilibrium with Constant Input and Exponential Decay}
+
+Consider a system with a constant input rate \( I \) (e.g., g/day) and exponential decay characterized by a half-life \( T_{1/2} \). The dynamics of the system can be described by the differential equation:
+
+\[
+\frac{dx}{dt} = I - kx
+\]
+
+where \( x(t) \) is the amount of material at time \( t \), and \( k \) is the decay rate. When the decay follows an exponential process with half-life \( T_{1/2} \), the decay rate \( k \) is related to the half-life by:
+
+\[
+k = \frac{\ln 2}{T_{1/2}}
+\]
+
+At equilibrium, \( \frac{dx}{dt} = 0 \), and the system reaches a steady state \( x^* \). Solving for \( x^* \), we find:
+
+\[
+x^* = \frac{I}{k} = \frac{I T_{1/2}}{\ln 2}
+\]
+
+This expression shows that the equilibrium amount increases linearly with the input rate \( I \) and with the half-life \( T_{1/2} \), and decreases with faster decay (larger \( k \)).
+
+\subsection*{Discrete-Time Equilibrium of Cohort-Based Litter Decay}
+
+In a discrete-time model where litter is added as a new cohort each year and previous cohorts decay independently at a fixed proportion \( d \), the total litter at time \( t \) is:
+
+\[
+L(t) = \sum_{\tau = 0}^{t} I \cdot (1 - d)^\tau
+\]
+
+This is a geometric series with ratio \( r = 1 - d \), and in the limit as \( t \to \infty \), the litter pool approaches a steady-state equilibrium:
+
+\[
+L^* = \sum_{\tau = 0}^{\infty} I \cdot (1 - d)^\tau = \frac{I}{d}
+\]
+
+The decay rate \( d \) is related to the half-life \( T_{1/2} \) (measured in the same units as the time step) by:
+
+\[
+d = 1 - 2^{-1/T_{1/2}}
+\]
+
+Substituting this expression for \( d \), the equilibrium litter amount becomes:
+
+\[
+L^* = \frac{I}{1 - 2^{-1/T_{1/2}}}
+\]
+
+This version is appropriate when cohorts are updated once per time step and decay occurs as a fixed proportion per step. It highlights how slower decay (smaller \( d \), i.e., longer \( T_{1/2} \)) leads to larger equilibrium litter pools.
+
+
+\subsection*{Cohort-Based Exponential Decay and Litter Accumulation}
+
+In some simulations, litter is not treated as a single decaying pool but is instead tracked in discrete cohorts, each of which decays independently according to an exponential decay law. When a fixed amount of litter \( I \) is added each time step (e.g., each year), and each cohort decays independently with a half-life \( T_{1/2} \), the total litter at time \( t \) is the sum of all surviving past cohorts.
+
+
+Each cohort decays as:
+\[
+\text{cohort}_i = I \cdot e^{-k \cdot \tau_i}
+\]
+where \( \tau_i \) is the age of the \( i \)-th cohort and \( k = \frac{\ln 2}{T_{1/2}} \) is the continuous-time decay rate.
+
+\[
+L(t) = \sum_{\tau = 0}^{t} I \cdot e^{-k \tau}
+\]
+
+
+Assuming a new cohort is added each year and decay is applied at discrete yearly intervals, the total steady-state litter amount is:
+\[
+L^* = \sum_{\tau=0}^{\infty} I \cdot e^{-k \tau} = I \cdot \sum_{\tau=0}^{\infty} e^{-k \tau}
+\]
+This is a geometric series with ratio \( r = e^{-k} \), so:
+\[
+L^* = \frac{I}{1 - e^{-k}} = \frac{I}{1 - 2^{-1/T_{1/2}}}
+\]
+
+This expression shows that in a cohort-based decay system, the total equilibrium amount of litter can be substantially higher than predicted by the continuous bulk-decay approximation \( x^* = \frac{I}{k} \). The discrepancy arises because past litter cohorts continue to contribute small amounts over many time steps.
+
+For example, with an input rate \( I = 12 \) units per year and half-life \( T_{1/2} = 0.5 \) years, we find:
+\[
+k = \frac{\ln 2}{0.5} = \ln 4 \approx 1.386,\quad e^{-k} = 0.25
+\]
+\[
+L^* = \frac{12}{1 - 0.25} = \frac{12}{0.75} = 16
+\]
+
+If a simulation using this approach instead stabilizes at a much higher value (e.g., 75), it indicates that the effective decay rate is slower than intended, and the implemented half-life is longer than specified. This discrepancy often arises from incorrect decay step calculations or from modeling decay over smaller time steps without adjusting the decay rate appropriately.
+
+
+Steady state:
+\[
+L^* = \sum_{\tau = 0}^{\infty} I \cdot e^{-k \tau} = \frac{I}{1 - e^{-k}}
+\]
+
+Discrete time litter accumulation:
+\[
+L(t) = \sum_{\tau = 0}^{t} I \cdot (1 - d)^\tau
+\]
+
+relating half-life to discrete decay:
+\[
+d = 1 - 2^{-1/T_{1/2}}
+\]
+
+Steady state:
+\[
+L^* = \sum_{\tau = 0}^{\infty} I \cdot (1 - d)^\tau = \frac{I}{d}
+\]
+
+
+\end{document}

@@ -1,0 +1,459 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\tableofcontents
+
+\section{Lokta-Volterra model with germination (previous model)}
+
+$N_{1,t+1} = N_{1,t} \cdot \lambda_1 \cdot g_1 \cdot \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)$\newline
+
+\noindent With exponential half life litter cohort tracking and accumulation 
+and simple dispersal
+
+\subsection{What changed}
+\begin{itemize}
+\item non-dimensionalized alphas
+\item took out $g$'s
+\item no litter accumulation
+\item dispersal is environmentally (litter) biased diffusion
+\item $\lambda$ boost is also based on litter differences
+\end{itemize}
+
+\section{New non-dimensionalized model}
+\begin{align}
+N_{1,t+1} &= N_{1,t} \cdot \lambda_1 \cdot \left(1 - N_{1,t} - \alpha \cdot N_{2,t} \right), \\
+N_{2,t+1} &= N_{2,t} \cdot \lambda_2 \cdot \left(1 - N_{2,t} - \beta \cdot N_{1,t} \right),
+\end{align}
+
+where:
+\[
+\alpha = \frac{\alpha_{12}}{\alpha_{22}}, \qquad \beta = \frac{\alpha_{21}}{\alpha_{11}}.
+\]
+
+\subsection{Equilibria}
+Four possible equilibria:
+
+\begin{itemize}
+  \item \textbf{Extinction}: $(N_1^*, N_2^*) = (0, 0)$.
+  \item \textbf{Species 1 only}: if $\lambda_1 > 1$, then
+  \[
+  (N_1^*, N_2^*) = \left(1 - \frac{1}{\lambda_1}, 0\right).
+  \]
+  \item \textbf{Species 2 only}: if $\lambda_2 > 1$, then
+  \[
+  (N_1^*, N_2^*) = \left(0, 1 - \frac{1}{\lambda_2} \right).
+  \]
+  \item \textbf{Coexistence} (both species present): 
+  Then back-substitute to get $N_1^*$.
+  \[
+  (N_1^*, N_2^*) = \big(\frac{1 - \frac{1}{\lambda_1}- \alpha(1 - \frac{1}{\lambda_2})}
+  {1 + \beta \alpha}, 
+  \frac{1- \frac{1}{\lambda_2}- \beta(1 - \frac{1}{\lambda_1})}
+  {1 + \beta \alpha} \big).
+  \]
+  %\[
+  %(N_1^*, N_2^*) = \big(\frac{ \frac{\lambda_1-1}{\lambda_1}
+  %-\alpha \frac{\lambda_2 -1}{\lambda_2}}{1 + \beta \alpha}, 
+  %\frac{\frac{\lambda_2-2}{\lambda_2}-\beta \frac{\lambda_1 -1}{\lambda_1}}
+  %{1 + \beta \alpha} \big).
+  %\]
+\end{itemize}
+  %numerator <- 1 - beta21 * (1 - 1/lambda1) - 1/lambda2
+  
+  %numerator <- (lambda1-1)/lambda1 - beta12*(lambda2-1)/lambda2
+  
+Coexistence requires $N_1^* > 0$ and $N_2^* > 0$, which occurs when interspecific competition is sufficiently weak and both species have $\lambda_i > 1$.
+\newline
+\noindent See \ref{section:ndm deriv} for derivation of model and equilibriums.
+
+\subsubsection{example vector field with isoclines}
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=1\textwidth]{../figures/vecFieldexample.pdf}
+\end{center}
+\end{figure}
+
+\section{Diffusion}
+
+Let $N_i(x,t)$ be the abundance of species $i$ in cell $x$ at time $t$,  
+$D_i$ the proportion of the population dispersing per time step,  
+$E(x)$ the environmental value at cell $x$,  
+$\theta$ the bias strength parameter,  
+and $\mathcal{N}(x)$ the set of neighboring cells of $x$.
+
+Let:
+\begin{itemize}
+    \item $N_i(x,t)$ = abundance of species $i$ in cell $x$ at time $t$
+    \item $D_i$ = fraction of the population dispersing per time step
+    \item $E(x)$ = environmental value at cell $x$
+    \item $\theta$ = bias strength parameter
+    \item $\mathcal{N}(x)$ = set of neighboring cells of $x$
+    \item $\mathcal{N}(o)$ = set of neighboring cells of origin $o$ (can include $o$ itself if self-retention is allowed)
+\end{itemize}
+
+\paragraph{1. Destination weights}
+For each destination cell $d \in \mathcal{N}(o)$ of origin cell $o$, assign an unnormalized weight:
+\[
+w(d) = \exp\big( \theta \, E(d) \big).
+\]
+
+\paragraph{2. Movement probability}
+The probability of moving from origin $o$ to destination $d$ is:
+\[
+p_{o \to d} = \frac{w(d)}{\sum\limits_{y \in \mathcal{N}(o)} w(y)}
+= \frac{\exp\big( \theta E(d) \big)}
+{\sum\limits_{y \in \mathcal{N}(o)} \exp\big( \theta E(y) \big)}.
+\]
+
+Note that:
+\[
+\sum_{d \in \mathcal{N}(o)} p_{o \to d} = 1
+\]
+for each origin $o$.
+
+\paragraph{3. Biased diffusion update}
+The biased diffusion step for species $i$ is:
+\[
+N_i(x, t+1) = (1 - D_i) \, N_i(x, t) 
++ D_i \sum_{o \in \mathcal{N}(x)} N_i(o, t) \, p_{o \to x}.
+\]
+
+Substituting $p_{o \to x}$:
+\[
+N_i(x, t+1) = (1 - D_i) \, N_i(x, t) 
++ D_i \sum_{o \in \mathcal{N}(x)} 
+\frac{N_i(o, t) \, \exp\big( \theta E(x) \big)}
+{\sum\limits_{y \in \mathcal{N}(o)} \exp\big( \theta E(y) \big)}.
+\]
+
+\textbf{English explanation:}
+
+For each patch $x$, there are neighbors $o$, that are the \emph{origin} of inflow to $x$. 
+The inflow to $x$ is, for each possible neighboring origin
+$o$, the population density of $o$ weighted by the 
+environmental attraction of $x$ [$\exp(\theta E(x))$] that is 
+scaled by the environmental attraction of the neighbors of 
+$o$. Note that when $\theta=0$, $p$ is uniform across neighbors and dispersal is unbiased.
+
+\subsection{Litter}
+
+As of now, litter in the next time step is simply the sum of scalar multiples of density in the previous time step.
+
+\[
+L(x,t) = l_1N_1(x,t-1) + l_2N_2(x,t-1)
+\]
+
+The environment is determined by litter differences:
+\[
+\Delta_L(x,t) = \sum_{x' \in \mathcal{N}(x)}L(x',t)-L(x,t)
+\]
+So a negative $\Delta_L(x)$ mean that $x$ has more litter than 
+neighbors $x'$. 
+
+\noindent To amplify the differences in diffusion, $E$ is the rank of $-\Delta_L$.
+
+\[
+E(x,t) = \text{rank} (-\Delta_L(x,t))
+\]
+
+why did I rank litter differences instead of just ranking the litter itself..? That would produce the same result I think. Well litter differences is first used in modifying $\lambda_1$ and I was first just using $E=-\Delta_L$ but it wasnt making strong enough differences. $E=L$ even smaller because the values are closer together. 
+
+\subsubsection{Litter and $\lambda$}
+Litter boosts $\lambda$ in species $1$. Let $\lambda_i^0$ be the baseline seed production without litter dynamics. With litter dynamics,
+\[
+\lambda_i = \lambda_i^0 \exp \big(-\rho \Delta_L \big)
+\]
+
+\section{Full model}
+
+Let $f_i()$ be the seed production and competition function,
+\begin{align}
+f_1(N_1,N_2) &= N_1 \lambda_1(1-N_1-\alpha N_2)\\
+f_2(N_1,N_2) &= N_2 \lambda_2(1-N_2-\beta N_1)
+\end{align}
+
+where germinants grow, compete, and make new seeds (or germinants?).
+
+The seeds/germinants then disperse, so,
+\begin{equation}
+%N_i(x,t+1) = f\big(N_i(x,t)\big) 
+N_i(x, t+1) = (1 - D_i) \, f_i\big(\mathbf{N}(x, t) \big) 
++ D_i \sum_{o \in \mathcal{N}(x)} 
+\frac{f_i\big(\mathbf{N}(o, t) \big)\, \exp\big( \theta E(x,t) \big)}
+{\sum\limits_{y \in \mathcal{N}(o)} 
+\exp\big( \theta E(y,t) \big)}
+\end{equation}
+\newline
+
+Expanded: (let $\beta_{ij} = \left[\alpha , \beta \right]$)
+\begin{align}
+N_i(x,t+1) &= (1-D_i)\,\lambda_i\,N_i(x,t)\Big(1-\sum_j \beta_{ij}N_j(x,t)\Big) \\
+&\quad + D_i \sum_{o\in\mathcal{N}(x)}
+\left[
+\frac{\exp\theta E(x,t)}{\sum\limits_{y\in\mathcal{N}(o)} \exp\theta E(y,t)}
+\; \lambda_i\,N_i(o,t)\Big(1-\sum_j \beta_{ij}N_j(o,t)\Big)
+\right].\nonumber
+\end{align}
+\newline
+
+\begin{align}
+E(x,t) &= E(\boldsymbol{l} \cdot \mathbf{N}(x,t-1)) = \text{rank}\left[-\sum_{x' \in \mathcal{N}(x)}L(x',t)-L(x,t) \right]\\
+&=\text{rank}\left[-\sum_{x' \in \mathcal{N}(x)} l_1N_1(x',t-1) + l_2N_2(x',t-1)-l_1N_1(x,t-1) - l_2N_2(x,t-1)\right]\nonumber
+\end{align}
+\newline
+
+\begin{align}
+\lambda_1 = \lambda_1^0 \,\, \exp -\Delta_L \, \rho_1 \\
+\theta_1 = 0 \quad \rho_2 = 0
+\end{align}
+
+\subsection{thoughts}
+Dispersal function does not change total counts $\sum \mathbf{N}(t)$. 
+Should it though?
+Does $f()$ make seeds or make germinants?
+If $f()$ makes germinants then its probably fine but then 
+$\lambda$ should probably account for germinants?
+Should be absorbed into competition too then.
+
+\section{Post meeting action items}
+\begin{itemize}
+\item Burn in monoculture time
+  \begin{itemize}\item essentially mean no dispersal for some time \end{itemize}
+\item Add one time for litter accumulation
+\item adjust sp2 litter-recruitment curve, strong when low too
+\item sp2 more competitive
+\end{itemize}
+
+\subsection{Changed lambda 1 function too}
+
+Used to be:
+\[
+\lambda_1 = \lambda_1^0 \exp (-\Delta_L \rho).
+\]
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=1\textwidth]{../figures/explam.pdf}
+\end{center}
+\end{figure}
+Now its a logistic function +1:
+\[
+\lambda_1 = \frac{L}{1+e^{-k(x-x_0)}} +1.
+\]
+\[
+\lambda_1 = \frac{2(\lambda_1^0 -1)}{1+e^{-\rho(-\Delta_L)}} +1.
+\]
+Where $x_0$ =0.
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=1\textwidth]{../figures/logislam.pdf}
+\end{center}
+\end{figure}
+
+\subsection{Simulations with monoculture burn-in time}
+\textbf{exponential lambda litter}
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=1\textwidth]{../figures/burnin_explamlit.pdf}
+\end{center}
+\end{figure}
+
+\textbf{logistic lambda litter}
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=1\textwidth]{../figures/burnin_logislamlit.pdf}
+\end{center}
+\end{figure}
+
+\textbf{logistic lambda litter-turn up sp2 inter comp}
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=1\textwidth]{../figures/burnin_logislamlitsp0.9.pdf}
+\end{center}
+\end{figure}
+\newpage
+
+\section{August 14 2025}
+\begin{itemize}
+\item is the asynchronous pattern because of the change to logistic or burn in? or iteraction
+\begin{itemize}\item logis without burnin is still synchronous. exp w burn in becomes syn
+\item -is something wrong? burn in really changes trajectory
+\end{itemize}
+\item make wrapper function to easily toggle
+\item isocline for those parameters?
+\item and vector field. what if i made vector field with litter dynamics
+\item also toggle for litter timescale
+\item maybe with logis litdif is not neccesary
+\item eventually will have to look at how rank is inflating things
+\item eventually increase gridsize too
+\end{itemize}
+
+\subsection{Whats going on with the flip from syn to asyn just by adding burnin time only for logis}
+In cell 1,1. Sp2 steadily grows - just from population dynamics. The two species are stabilizing towards coexistence equilibrium.
+When this cell reaches high litter status, sp2 jumps up.
+At the next time point, this is too much for sp1 to handle so it goes down. 
+As litter declines, sp2 starts leaking out and sp1 climbs again.
+When sp2 is low, sp1 is climbing towards its monoculture equilibrium. Sp1 in that cell has to steadily climb until it becomes the litter champion for sp2 to come in again.
+
+
+When theres no burnin time, both species are boosted by litter and hurt by less litter. 
+
+\subsection{They want to be synchronous so bad}
+So - I have a wholy grail result. And that wholy grail result occurs when 
+1) theres a sufficient burn in time (>3), 
+2) theres low litter accumulation (~<0.15),
+3) theta is high. 
+
+When these things diverge away from wholy grail parameters, 
+synchrony comes back. And not just any kind of synchrony.
+Its a strong switch back year to year. 
+Time adjacent peaks and valleys in sp2 as its tracking litter.
+Even when I change theta, which doesnt directly alter the amount of litter...
+Low theta makes the change.. 
+
+Whens there's alot of sp1 at t=10, litter is high at t=11, and sp2 is boosted in t=12.
+
+
+\newpage
+
+\section{Non-dimensionalization of the Discrete-Time Lotka-Volterra Competition Model (without germination)}\label{section:ndm deriv}
+
+We begin with the standard discrete-time Lotka-Volterra competition model for two species:
+
+\begin{align}
+n_{1,t+1} &= n_{1,t} \cdot \lambda_1 \cdot \left(1 - \alpha_{11} n_{1,t} - \alpha_{12} n_{2,t} \right), \\
+n_{2,t+1} &= n_{2,t} \cdot \lambda_2 \cdot \left(1 - \alpha_{22} n_{2,t} - \alpha_{21} n_{1,t} \right),
+\end{align}
+
+where:
+\begin{itemize}
+  \item $n_{i,t}$ is the population size of species $i$ at time $t$,
+  \item $\lambda_i$ is the finite rate of increase for species $i$,
+  \item $\alpha_{ij}$ is the per capita competitive effect of species $j$ on species $i$.
+\end{itemize}
+
+We non-dimensionalize the system by rescaling population sizes relative to the intraspecific carrying capacities:
+
+\[
+K_1 = \frac{1}{\alpha_{11}}, \qquad K_2 = \frac{1}{\alpha_{22}},
+\]
+\[
+x_t = \frac{n_{1,t}}{K_1}, \qquad y_t = \frac{n_{2,t}}{K_2}.
+\]
+
+Substituting into the original equations and simplifying, we obtain:
+
+%\begin{align*}
+%x_{t+1} &= x_t \cdot \lambda_1 \cdot \left(1 - x_t - \beta_{12} y_t \right%), \\
+%y_{t+1} &= y_t \cdot \lambda_2 \cdot \left(1 - y_t - \beta_{21} x_t \right%),
+%\end{align*}
+%change from beta12 -> alpha nad beta21 -> beta
+
+\begin{align*}
+x_{t+1} &= x_t \cdot \lambda_1 \cdot \left(1 - x_t - \alpha \cdot y_t \right), \\
+y_{t+1} &= y_t \cdot \lambda_2 \cdot \left(1 - y_t - \beta \cdot x_t \right),
+\end{align*}
+
+where:
+\[
+\alpha = \frac{\alpha_{12}}{\alpha_{22}}, \qquad \beta = \frac{\alpha_{21}}{\alpha_{11}}.
+\]
+
+This system is now expressed in terms of dimensionless abundances $x_t$ and $y_t \in [0,1]$, scaled by each species' carrying capacity. 
+The parameters %$\beta_{ij}$ 
+$\alpha$ and $\beta$ represent the strength of interspecific competition relative to intraspecific competition.
+
+$x$ and $y$ are replaced with $N_1$ and $N_2$ in previous sections.
+
+\subsection{Equilibrium Analysis}
+
+To find equilibrium points, we solve for fixed points $(x^*, y^*)$ where $x_{t+1} = x_t = x^*$ and $y_{t+1} = y_t = y^*$. Substituting into the model:
+
+\begin{align*}
+x^* &= x^* \cdot \lambda_1 (1 - x^* - \alpha y^*), \\
+y^* &= y^* \cdot \lambda_2 (1 - y^* - \beta x^*).
+\end{align*}
+
+Factoring gives:
+
+\begin{align*}
+x^* \left[\lambda_1 (1 - x^* - \alpha y^*) - 1 \right] &= 0, \\
+y^* \left[\lambda_2 (1 - y^* - \beta x^*) - 1 \right] &= 0.
+\end{align*}
+
+This yields four possible equilibrium types:
+
+\begin{itemize}
+  \item \textbf{Extinction}: $(x^*, y^*) = (0, 0)$.
+  \item \textbf{Species 1 only}: if $\lambda_1 > 1$, then
+  \[
+  (x^*, y^*) = \left(1 - \frac{1}{\lambda_1}, 0\right).
+  \]
+  \item \textbf{Species 2 only}: if $\lambda_2 > 1$, then
+  \[
+  (x^*, y^*) = \left(0, 1 - \frac{1}{\lambda_2} \right).
+  \]
+  \item \textbf{Coexistence} (both species present): solve
+  \[
+  \lambda_1 (1 - x^* - \alpha y^*) = 1, \qquad \lambda_2 (1 - y^* - \beta x^*) = 1.
+  \]
+  Solving the first equation for $x^*$:
+  \[
+  x^* = 1 - \frac{1}{\lambda_1} - \alpha y^*,
+  \]
+  and substituting into the second:
+  \[
+  y^* = \frac{1 - \beta(1 - \frac{1}{\lambda_1}) - \frac{1}{\lambda_2}}{1 + \beta \alpha}.
+  \]
+  Then back-substitute to get $x^*$.
+\end{itemize}
+
+Coexistence requires $x^* > 0$ and $y^* > 0$, which occurs when interspecific competition is sufficiently weak and both species have $\lambda_i > 1$.
+
+%\subsection*{Extensions with Feedbacks}
+
+%In models with litter feedbacks, seed production $\lambda_i$ and germination $g_i$ are functions of accumulated litter $L_t$, which itself depends on past species abundances. For example:
+
+%\[
+%x_{t+1} = x_t \cdot \lambda_1(L_t) \cdot g_1(L_t) \cdot \left(1 - x_t - \alpha y_t \right).
+%\]
+
+%This introduces dynamic feedbacks, making the equilibrium conditions depend on the joint dynamics of species and litter. In such cases, equilibrium solutions typically require numerical approximation or model-specific analytic expressions.
+%Now the equilibrium depends on the litter state, which depends on species abundances — so the equilibria become solutions to coupled nonlinear equations involving: species abundances, litter accumulation and decay (possibly cohort tracking), and feedback modifed $\lambda_i(L), g_i(L)$.
+%We can still find equlibria numerically or semi-analytically if you give explicit forms for: litter accumulation and decay, and $\lambda_i(L), g_i(L)$ functions.
+\newpage
+
+\[
+\begin{aligned}
+N_i(x,t+1) &= (1-D_i)\,N_i(x,t)\exp\!\Bigg(r_i\Big(1-\sum_{j}\alpha_{ij}N_j(x,t)\Big)\Bigg) \\
+&\quad + D_i \sum_{o\in\mathcal{N}(x)}
+\left[
+\frac{\exp\!\big(\beta E(x)\big)}{\sum\limits_{y\in\mathcal{N}(o)}\exp\!\big(\beta E(y)\big)}
+\; N_i(o,t)\exp\!\Bigg(r_i\Big(1-\sum_{j}\alpha_{ij}N_j(o,t)\Big)\Bigg)
+\right],
+\end{aligned}
+\]
+
+
+
+
+\begin{align}
+N_i(x,t+1) &= (1-D_i)\,G_i(x,t) \\
+&\quad + D_i \sum_{o\in\mathcal{N}(x)}
+\left[
+\frac{\exp\!\big(\beta E(x)\big)}{\sum\limits_{y\in\mathcal{N}(o)}\exp\!\big(\beta E(y)\big)}
+\; G_i(o,t)
+\right],
+\end{align}
+
+
+
+\end{document}

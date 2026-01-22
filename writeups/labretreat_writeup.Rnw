@@ -1,0 +1,672 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[normalem]{ulem}
+\usepackage{xcolor}
+%\usepackage{authblk}
+\usepackage[margin=2.5cm]{geometry}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\title{Litter feedbacks maintain global coexistence despite local exclusion}
+\date{}
+%Put other possible titles below, commented, and we will select the best one at the end
+
+
+
+
+%\affil[a]{Institute of Ecology and Evolution, University of Oregon}
+%\affil[a]{Environmental Studies Program and Department of Biology, University of Oregon}
+%\affil[*]{Corresponding author, reuman@ku.edu}
+%\linenumbers
+\maketitle
+\author[a]{Pimsupa Jasmin Albert}
+\author[a]{Lauren M. Hallett}
+
+%\noindent \textbf{Running head:} Litter feedbacks maintain coexistence \\
+%\noindent \textbf{Key words:} asymmetric tail association, biodiversity, coexistence, competition, copula, modern coexistence theory, niche differentiation, storage effects \\
+%\doublespacing
+\color{blue}
+\section{desired feedback} 
+Most of the writing included here is from an old version that I had to 
+turn in for writing class. Methods and some results are updated.
+Older framing around highlights alot about priority effects.
+Now I'm thinking it doesn't have to \emph{only} be about priority effects.
+And maybe lead more about endogenous feedbacks.
+
+Anyway, at this point feedback about the simulations would be more useful that 
+writing. Although if anyone has thoughts on the story and general framing that 
+would be useful. At this point much of my simulation scripting (for this model) is set,
+and I am getting the trend we're looking for (yay!). 
+My next step is thinking about a summary statistic and using that to
+visualize against different model parameters. 
+
+%Currently 150 of an allowed 150 words for Ecology Letters
+\color{black}
+
+%Currently 150 of an allowed 150 words for Ecology Letters
+\begin{abstract}
+\noindent Non-native annual grasses often exhibit priority effects - historically contingent competitive
+exclusion. While priority effects across species result in local exclusion, at larger spatial scales a
+pattern of stable spatial monoculture patchiness may emerge. However, observations in
+California rangelands reveal a possible bistable switching between invasive medusahead and
+naturalized forage grass, wild oats. Here, we show through simulations of a simple two-species
+Lotka-Volterra model that positive endogenous feedbacks emerge with increasing spatial scale
+to maintain spatiotemporal coexistence. Many spatial coexistence studies assume external
+forces as a driver of spatial heterogeneity. Our study highlights that endogenous processes
+alone can maintain coexistence across space despite the common requirement of exogenous
+drivers.
+\end{abstract}
+
+
+\section{Introduction}
+% \begin{enumerate}
+% \item strong competitors..alternative stable states?
+% \item coexistence..fluctuation dependent..exogenous
+% \item endogenous feedbacks
+% \item medusahead, avena, and litter case study
+% \end{enumerate}
+
+\begin{enumerate}
+\item endogenous feedbacks, define, can produce fluctuations that may not be obvious to capture goal. although well studied not common in coexistence. our goal
+\item coexistence..fluctuation dependent..exogenous
+  \begin{itemize} \item For eons, ecologists and mathematicians have been interested in species coexistence. 
+  \item Various theories have emerged to account fluctuations across both time and space (ie, storage effect).
+  \item However, these fluctuations tend to be abiotic and particularly, with the inclusion of space, environmental heterogeneity is almost always an assumption.
+  \item But what iF spatial heterogeneity was created endogenously? ... \end{itemize}
+\item examples, plant soil feedbacks
+\item medusahead, avena, and litter case study
+\end{enumerate}
+
+\textcolor{blue}{what I have previously written..based around priority effects and alternative stable states}
+
+Invasive species often demonstrate strong priority effects, wherein their competitive advantages
+during arrival and establishment induce historically contingent competitive exclusion, a process
+where species arrivals determine community assembly outcomes (Hess et al. 2019). Strong and
+persistent priority effects can create alternative stable states. States switches then demand
+large perturbations and native species re-establishment likelihood is reduced, even when
+environmental conditions are favorable (Gulpin and Case 1976; Tilman 1988). Spatially,
+alternative stable states may produce a stable patchiness pattern across a landscape where the
+monoculture state is initial abundance dependent (Shurin et al. 2004). That is, while priority
+effects beget local exclusion, regional spatial monoculture patchiness may emerge, a process
+that is spatial heterogeneity dependent.
+
+Various theories have been developed and extended to account for fluctuations across
+space, for example, developments in theory of the spatial storage effect and metacommunity
+coexistence (Chesson, 2000a; Shoemaker and Melbourne, 2016). Space inclusion often involves
+a reliance on some presumed external drivers (e.g., climatic, trophic) which govern spatial
+(Leibold et al., 2004). Spatial coexistence theories emphasize the role of environmental
+variability in maintaining species diversity, for instance differences in resource availability,
+habitat conditions, or disturbance regimes across space may create opportunities for species to
+persististence (Chesson, 2000). The reliance on spatial heterogeneity assumes that
+environmental variation is essential for coexistence by providing niches or refuges that prevent
+competitive exclusion. While the importance of environmental variability is a reasonable
+assumption, other bodies of work highlight emergent dynamics with increased spatial scale,
+even in the absence of environmental variability (Levin, 1992).
+
+Emergent dynamics arise from intrinsic interactions among species and individuals.
+Individuals can modify their environment through positive feedbacks, and through these
+endogenous feedbacks alone, mechanisms can emerge that maintain species persistence in
+the absence of external variation. Research in positive endogenous feedbacks, highlighting that
+variation can occur through entirely internal biotic processes, is exemplified by plant-soil
+feedbacks of exotic invaders, where individuals modify the soil microbial community that in
+effect is beneficial to themselves (Levine et al., 2006; van der Putten et al., 2013). The
+importance of plant-soil feedbacks for invasion success has been put to the test via two
+hypotheses: individuals that have experienced the feedback, and are the most demographically
+successful, disperse and “push” forward exotic species invasion. Alternatively, if feedbacks are
+not the mechanism for invasive spread, individuals in the frontline that would have not
+experienced the feedback, nevertheless contribute most to dispersal and ”pull” the invasion
+forward (Levine et al., 2006). These hypotheses assume a single colonizing species and that
+feedbacks are species-specific (i.e., only beneficial to that species), contributing to invasive
+monoculture dominance; however, when feedbacks are positive across species, priority effects
+may be disrupted and fluctuating bi-stability may emerge.
+
+Here, we compare a simple two-species Lotka-Volterra competition model and an
+extended version that is entirely driven by spatially structured endogenous feedbacks to assess
+the conditions under which push and pull mechanisms of positive endogenous feedbacks
+overcome priority effects and contribute to species coexistence. Our simulations aim to model
+an example involving positive litter feedbacks where two competing annual grasses coexist in
+patches across California rangelands: Medusahead (MH, Taentheranium caput-medusae),
+noxious invasive, and Avena (AV, Avena barbata), naturalized forage. MH exhibits signs of
+positive feedbacks with itself that make it a successful invasive, largely attributed to its high
+silica content, making it unpalatable to grazers and slow to decompose. Slow decomposition
+causes large buildups of MH litter and hinders the growth of other species, while benefiting both
+itself and interestingly, AV (Mariotte et al., 2017).
+
+While AV has historically been the competitive dominant of California rangelands,
+outcompeting native grasses and forbs since its introduction, more recent MH invasion has
+triggered patch transitions, a system switch previously described using alternative stable states
+with almost irreversible transitions back to AV (George et al., 1992). However, more recent
+observations describe dramatic, symmetric and rapid patch switching between AV and MH
+(Stein et al., 2016). Experimentally tested positive feedbacks between litter depth and both MH
+and AV vital rates (Mariotte et al., 2017) may explain a possible “push” and “pull” mechanism
+generating the observed patch switching over time (\ref{fig:grassdiagram}). 
+AV germination fraction increases in higher litter depths, 
+thus AV may be pulled from its frontline where there is no litter into MH
+patches with litter. On the other hand, MH germination is not related to litter depth but MH seed
+production is, pushing MH out of its former patches. The cycle repeats as AV and MH disperse
+and invade into each other and swap places. Given the litter feedback dynamics between AV
+and MH and dispersal’s important role, we hypothesize that 1) positive litter feedbacks emerge
+with increasing spatial scale and thus 2) spatially structured positive litter feedbacks maintain
+global coexistence between AV and MH despite local competitive exclusion.
+
+\section{Methods}
+\subsection{Population growth}
+To investigate the role of endogenous feedbacks on spatial coexistence, 
+we expanded a simple Lotka-Volterra model (ref) to describe an example case study of two annual grass species \emph{Avena} and Medusahead, $N_i \in {1,2}$, that respond to grass litter accumulation via different vital rates. 
+For simplicity, the population of $N_i$ at time $t+1$ depends on its intrinsic growth $\lambda_i$, and interspecific competition $\beta_{ij}$. 
+
+\begin{equation}
+N_{i,t+1} = N_{i,t} \cdot \lambda_i \cdot \left(1 - N_{i,t} - \beta_{ij} \cdot N_{j,t} \right)
+\end{equation}
+
+The model was non-dimenionalized such that $\beta_{ij} = \frac{\alpha_{ij}}{\alpha_{jj}}$ of the standard LV competition model. Germination was not included for simplicity, although species 2 responds to litter through
+germination. Instead, species 2 response to litter is modified through dispersal of germinants. 
+%explain something about germinants model
+\subsection{Space and dispersal}
+We allow for environmentally biased dispersal.
+
+Let $N_i(x,t)$ be the abundance of species $i$ in cell $x$ at time $t$,  
+$D_i$ the proportion of the population dispersing per time step,  
+$E(x)$ the environmental value at cell $x$,  
+$\theta$ the bias strength parameter,  
+and $\mathcal{N}(x)$ the set of neighboring cells of $x$.
+
+Let:
+\begin{itemize}
+    \item $N_i(x,t)$ = abundance of species $i$ in cell $x$ at time $t$
+    \item $D_i$ = fraction of the population dispersing per time step
+    \item $E(x)$ = environmental value at cell $x$
+    \item $\theta$ = bias strength parameter
+    \item $\mathcal{N}(x)$ = set of neighboring cells of $x$
+    \item $\mathcal{N}(o)$ = set of neighboring cells of origin $o$ (can include $o$ itself if self-retention is allowed)
+\end{itemize}
+
+\paragraph{1. Destination weights}
+For each destination cell $d \in \mathcal{N}(o)$ of origin cell $o$, assign an unnormalized weight:
+\[
+w(d) = \exp\big( \theta \, E(d) \big).
+\]
+
+\paragraph{2. Movement probability}
+The probability of moving from origin $o$ to destination $d$ is:
+\[
+p_{o \to d} = \frac{w(d)}{\sum\limits_{y \in \mathcal{N}(o)} w(y)}
+= \frac{\exp\big( \theta E(d) \big)}
+{\sum\limits_{y \in \mathcal{N}(o)} \exp\big( \theta E(y) \big)}.
+\]
+
+Note that:
+\[
+\sum_{d \in \mathcal{N}(o)} p_{o \to d} = 1
+\]
+for each origin $o$.
+
+\paragraph{3. Biased diffusion update}
+The biased diffusion step for species $i$ is:
+\[
+N_i(x, t+1) = (1 - D_i) \, N_i(x, t) 
++ D_i \sum_{o \in \mathcal{N}(x)} N_i(o, t) \, p_{o \to x}.
+\]
+
+Substituting $p_{o \to x}$:
+\[
+N_i(x, t+1) = (1 - D_i) \, N_i(x, t) 
++ D_i \sum_{o \in \mathcal{N}(x)} 
+\frac{N_i(o, t) \, \exp\big( \theta E(x) \big)}
+{\sum\limits_{y \in \mathcal{N}(o)} \exp\big( \theta E(y) \big)}.
+\]
+
+\textbf{English explanation:}
+
+For each patch $x$, there are neighbors $o$, that are the \emph{origin} of inflow to $x$. 
+The inflow to $x$ is, for each possible neighboring origin
+$o$, the population density of $o$ weighted by the 
+environmental attraction of $x$ [$\exp(\theta E(x))$] that is 
+scaled by the environmental attraction of the neighbors of 
+$o$. Note that when $\theta=0$, $p$ is uniform across neighbors and dispersal is unbiased.
+
+
+\subsection{Litter}
+Across space, Avena and Medusahead are boosted in high litter patches, although, differently, though different stage-structured vital rates. 
+In our case study, litter is created endogenously and feed back to influence population dynamics. Litter at time $t+1$, is simply a scalar multiple, $l_i$ of $N_i$ at time $t$. The scalar, $l_i$ represents a fatal conversion of living grass individuals to unit of litter. 
+
+\begin{equation}
+L_{t+1} = \sum l_i \cdot N_{i,t}
+\end{equation}
+
+Yes, this is really simply and doesn't allow accumulation and decay. I have toyed with accumulation at time $t+2$ as litter at time $t+1$ multiplied by $d$, a decay constant. So $L_{t+2} = \sum l_i \cdot N_{i,t+1} + d \cdot L_{t+1}$.
+\subsubsection{Litter differences}
+We chose to define litter feedbacks as a function of neighbor litter differences, $\Delta_L,x$. 
+\begin{equation}
+\Delta_L(x,t) = \sum_{x' \in \mathcal{N}(x)}L(x',t)-L(x,t)
+\end{equation}
+So a patch, $x$ with high $\Delta_L$ means that it has more litter than its (8) neighbors. 
+
+\subsubsection{Litter boost $\lambda$ in species 1}
+When litter is high, Medusahead is boosted in seed production. 
+We used a logistic function to model how its baseline $\lambda_1^0$ is modifed by litter. Precisley, the modification depends on $\Delta_L,x$, the summed difference between the current patch and neighboring patches, such that a patch with more litter on average that its neigbors, $\lambda_1$ will be boosted greater than $\lambda_1^0$. But a patch with less litter on average than its neighbors will reduce $\lambda_1$ to less than $\lambda_1^0$. 
+The logistic function is ideal in that it is naturally asymptotic and bounded between zero and the numerator. The rate at which it reaches the asymptotes is defined by $\rho$, which in our example represents the degree in which litter influences $\lambda_1$.
+\begin{equation}
+\lambda_1(\Delta_L) = \frac{(\lambda_1^0-1)2}{1+e^{-\rho \Delta_L}}
+\end{equation}
+The numerator, $(\lambda_1^0-1)2$, maintains $\lambda_1^0$ at $\Delta_L=0$.
+\subsubsection{Litter attracts germinants of sp2}
+For species 1 and all no litter models, $\theta=0$ in the dispersal function, indicating non-environmentally
+biased dispersal. But for species 2, $\theta>0$ and its germinants are attracted to litter, 
+as shown for Avena (Mariotte 2016). We define $E_x$ as the sum of relativised neighbor litter ranking. 
+
+\subsection{Simulation}
+For each simulation, the model was integrated using a forward over a duration sufficient for
+system stabilization (typically 15–30 time units). As in the model, dispersal was implemented after
+deterministic growth and competition within each patch. Grid edges were either treated as
+true zeros (such that a corner patch has only three neighbors: two adjacent and one diagonal) 
+or torodial (edge neighbors wrap around to the other side). 
+Initial conditions were randomized as follows. Across patches, one species was introduced at high
+density (e.g., 0.70), while the other was absent. The species populations were allowed to grow 
+without competition and without dispersal for an amount of time, $t_D$, i.e., 
+monoclture burn-in time. At time, $t=t_D$ a small amount of the other species was
+introduced and dispersal was allowed. We repeated simulations across a range of
+spatial extents (from 1 to 100 patches) and with and without space (dispersal) or litter feedbacks, 
+for a neutral, competitive, and priority effects model. List parameters space: 
+$\lambda^1_0 \in [1,3], \beta_{ij} \in [0.5,1.5], \theta \in [0,6]$, etc...
+
+\subsection{Analysis}
+Across model parameters and for each spatial scale and litter regime, we recorded: 
+1) local and regional species abundances, 
+2) species occupancy (number of patches where each species persisted), and 
+3) coexistence probability (proportion of patches where both species persisted at
+above 20 percent of total patch abundance). 
+\textcolor{blue}{This is a place holder and I need to think more about what analysis/calculations I want 
+to do on the simulated data to easily show trends acorss parameter ranges.}
+These metrics were computed at equilibrium across 50 replicate simulations per treatment. 
+This design allowed us to quantify the scale-dependence of litter feedbacks as a mechanism of coexistence.
+
+\section{Results}
+%Figures show $\lambda_1^0 = \lambda_2 = 2$, $\alpha=1.2$, $\beta=0.5$, $D=0.5$, $\theta=6$, $\rho=1$.
+
+\subsection{Non-spatial models}
+Populations stabilize at analytical equilibriums.
+\begin{itemize}
+  \item \textbf{Extinction}: $(N_1^*, N_2^*) = (0, 0)$.
+  \item \textbf{Species 1 only}: if $\lambda_1 > 1$, then
+  \[
+  (N_1^*, N_2^*) = \left(1 - \frac{1}{\lambda_1}, 0\right).
+  \]
+  \item \textbf{Species 2 only}: if $\lambda_2 > 1$, then
+  \[
+  (N_1^*, N_2^*) = \left(0, 1 - \frac{1}{\lambda_2} \right).
+  \]
+  \item \textbf{Coexistence}: 
+  \[
+  (N_1^*, N_2^*) = \big(\frac{1 - \frac{1}{\lambda_1}- \beta_{12}(1 - \frac{1}{\lambda_2})}
+  {1 + \beta_{12} \beta_{21}}, 
+  \frac{1- \frac{1}{\lambda_2}- \beta_{21}(1 - \frac{1}{\lambda_1})}
+  {1 + \beta_{12} \beta_{21}} \big).
+  \]
+\end{itemize}
+
+When $\beta_{12}=\beta_{21}>1$, leads to priority effects. 
+Winner reaches monoculture equilibrium and looser goes to zero.
+See in app. 
+The identity of winner depends on initial density. 
+However, global density is at the coexistence equilibrium.
+
+\subsection{Adding space alone does not rescue coexistence}
+Populations reach equilibriums faster.
+In priority effect parameters, dispersal saves then from extinction and they instead both reach the coexistence equilibrium. If odd gridsize, the sp with most initial grids wins.
+\subsection{with litter but no dispersal}
+Sp1 wins even if predicted to loose ?
+With PE, depends on init dens. 
+
+\subsection{Litter feedbacks enable dynamic patch switching and global coexistence}
+In contrast, incorporating litter dynamics significantly altered competitive outcomes (Figure X).
+When litter accumulation positively influenced the intrinsic growth rate of 
+species 1 (via parameter $\rho$) and the germinant diffusion of species 2 
+(via $\theta$), the model generated conditions under which 
+local dominance could shift over time due to legacy 
+effects of past occupancy. These feedbacks created temporally 
+dynamic advantages that allowed both species to re-
+invade patches they had previously been excluded from (Figure X).
+Under neutral parameterizations (equal intrinsic growth rates, and
+competition coefficients $\beta_{ij}=1$),  
+litter feedbacks produced stable coexistence across the landscape,
+with patch occupancy by each species fluctuating over time but 
+%neither species going extinct.
+sp2 is never greater than sp1 and is slowing going extinct Fig.\ref{fig:neutral}.
+Species 2 $\lambda$ must be boosted to reach densities similar to sp1 and maintain 
+stability (visual, at least in 100 times). Fig. \ref{fig:neutral-ish}.
+Even under strong priority effects ($\beta_{12}$ and $\beta_{21} >1$), coexistence was maintained in
+(some percent) of simulations when dispersal was moderate and litter feedbacks were sufficiently strong
+($\rho \geq X(1?), \theta \geq X, D>X)$. 
+In these scenarios, dominance periodically shifted between species within
+patches, (and adjacent patches are opposite), 
+and regional coexistence was stabilized through asynchronous patch dynamics (Figure ).
+
+\subsection{Parameter regimes supporting coexistence}
+Coexistence occurred within specific ranges of the feedback parameters and dispersal
+rates. 
+When litter feedbacks were weak ($\rho < X$, $\theta < X$), or when dispersal was either too
+limited or too widespread, coexistence broke down and one species was excluded. 
+Too little dispersal prevented recolonization of newly favorable patches, 
+while excessive dispersal homogenized the system and re-established competitive exclusion. 
+Optimal coexistence was observed at intermediate dispersal (X–X fraction of individuals moving per timestep) 
+and moderate litter feedback strength ( $\rho \in {0.2, 0.4}; \theta \in {0.3, 0.6}$).
+
+\subsection{When dynamics are synchronous}
+Patch switching dynamics produce temporal and spatial asynchrony. When one species grows in a patch, the other declines, and species identities are opposed in adjacent patches, leading to a fluctuating checkerboard pattern over term. 
+Changes to population parameters or simulation design can lead to synchronous dynamics instead. 
+\begin{itemize}
+\item When burn in time is low, <3 Fig \ref{fig:noburnin}. Fig \ref{fig:burnin1wrap0}
+\item When litter can accumulate and decays at time 2 <.87 ish. Fig \ref{fig:d20.2wraptord}, \ref{fig:d20.2wrap0}
+\begin{itemize}\item might matter less for bigger grids though Fig \ref{fig:d20.2grid4}\end{itemize}
+\item When $\theta$ is low..
+\begin{itemize}\item Again, matters most for small grid size. And zero wrapping (which essentially makes a smaller grid than torodial wrapping. Low theta (1-2) for bigger grids is actually quite nice. Fig. \ref{fig:lowthetagrid5}, \ref{fig:theta1grid5} \end{itemize}
+\item When position changes? Figs \ref{fig:pos1}, \ref{fig:pos2}
+  \begin{itemize} \item also when position changes wrap type makes a difference for synchrony Fig \ref{fig:pos1_wrap0}
+  \item this one truly makes no sense to me 
+  \item i think the sp introductions at t=5 are still the same too? \end{itemize}
+\end{itemize}
+
+\section{Discussion}
+\textcolor{blue}{old discussion framed around the species having strong priority effects..}
+
+Our results demonstrate that spatial processes and feedbacks from litter accumulation jointly
+mediate species coexistence in a competitive system \sout{where priority effects} that would otherwise
+lead to exclusion. Specifically, we found that while \sout{priority effects} exclusions dominate in non-spatial
+models and spatial models without endogenously driven feedbacks, the addition of biologically
+plausible litter-mediated feedbacks enables dynamic patch turnover and long-term coexistence
+across the landscape (Fig XX). Our findings suggest that coexistence emerges from the
+interaction between spatial processes, temporal endogenous environmental modification (via
+litter), and competition.
+
+While models without litter feedbacks, with and without spatial structure, resulted in no
+coexistence, in contrast, adding spatial structure with dispersal and incorporating feedbacks
+from accumulated litter altered the system’s dynamics and coexistence outcomes. By allowing
+for species specific stage-structured litter feedbacks where positive effects of litter on species
+1’s intrinsic growth rate and species 2’s germination created shifting environmental conditions
+that allowed each species to exploit the legacy of its own and its competitor’s past occupancy.
+These feedbacks broke the static nature of local priority effects by enabling patch conditions to
+change over time, thus allowing competitors to recolonize and persist. Here, litter functions as a
+time-varying environmental modifier, introducing a form of endogenous niche construction
+(Odling-Smee et al. 2003) that stabilizes coexistence through temporal niche differentiation.
+
+Without space or litter feedbacks, outcomes aligned with classical theory: strong priority
+effects led to exclusion, even under neutral parameters where stochasticity alone broke
+symmetry (REF). These results reinforce that in closed, homogeneous systems, initial
+conditions and competitive hierarchies dictate long-term outcomes (Ke and Letten 2018). Adding
+spatial structure and dispersal allowed for local variation but did not enable regional
+coexistence. Consistent with previous work, space alone was insufficient to overcome
+deterministic priority effects when interspecific competition exceeded intraspecific competition
+(Amarasekare 2003; Levine et al. 2004).
+
+This study extends prior work by explicitly modeling how litter-mediated feedbacks can
+modulate demographic rates in spatially structured environments. Our study specifically
+illuminates possible dynamics between noxious medusahead and naturalized forage Avena in
+California rangelands where frequent switching between patches of the two annual grasses has
+been observed (Stein et al. 2016) and litter feedbacks and stage-structured vital rates has been
+experimentally tested (Mariotte et al. 2017). In empirical systems such as California grasslands,
+where litter can suppress or promote germination and growth (Dyer and Rice 1997; Eviner and
+Hawkes 2008), our findings suggest a plausible mechanism for the species persistence despite
+competitive pressure from successful invaders. Importantly, the species-specific effects of litter
+–benefiting different life stages in each species– underscore the importance of considering
+feedback heterogeneity when evaluating coexistence mechanisms.
+
+Similar to the spatial storage effect (Chesson 2000), a fluctuation dependent mechanism
+of coexistence, asynchronous dynamics across patches can buffer species against regional
+extinction. However, unique to our study is that these dynamics arise from endogenously
+generated feedbacks rather than fixed environmental heterogeneity. In classic storage effect
+models, coexistence relies on externally imposed spatial or temporal variation. Here, litter-
+mediated feedbacks create shifting local conditions that favor different species over time,
+enabling patch turnover without any imposed environmental variation. This self-generated
+heterogeneity allows inferior competitors to persist by exploiting the biotic legacies of prior
+dominance, highlighting the potential for niche construction to stabilize coexistence in spatial
+systems.
+
+While our model captures key dynamics relevant to priority effects and spatial
+coexistence, it abstracts away several ecological complexities. For example, we assume
+constant parameter values for feedback strengths, while in nature, these ostensibly vary with
+fluctuation in precipitation (Stein et al. 2016), increasing mean annual temperature, or microbial
+mediation (Gornish et al. 2016). Additionally, we consider only two species, though real
+communities involve complex multi-species interactions that could amplify or dampen the
+feedbacks we describe. While here we focused on the two dominating species in California
+rangelands and specifically litter feedbacks, observed communities may include more species,
+potentially increasing competitive pressures (Chesson 1994) and neutralizing the coexistence
+contribution of litter feedbacks. Microbial interactions can also neutralize litter feedbacks, for
+example, MH might experience negative plant-soil feedbacks, associating with undesirable
+microbes over time, causing a pull out of its patches (Forero et al. In prep.).
+In conclusion, our findings highlight how the interaction of spatial dynamics with
+endogenously mediated feedbacks can reverse exclusionary outcomes driven by priority effects.
+Coexistence, in this context, does not emerge from static niche differentiation but from temporal
+patch turnover driven by biotic legacies. This suggests that restoration and management efforts
+aiming to support coexistence may benefit from enhancing or mimicking such feedbacks, for
+instance, by manipulating litter levels or promoting species-specific germination cues across a
+heterogeneous landscape.
+
+% \section{Feedback}
+% What kind of metric can I use to envelope these dynamics into one. 
+% \section{Author contributions}
+% \section{Acknowledgements}
+% \section{Funding information}
+
+%\bibliography{refs}
+\clearpage
+\newpage
+
+\begin{figure}
+\includegraphics[width=\textwidth]{./mh-av-sketch.pdf}
+\caption{Diagram of dynamics. Add math!} 
+\label{fig:grassdiagram}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=1.2\textwidth]{../figures/grassdiagram.pdf}
+\caption{Diagram of dynamics. With math!
+\newline
+\newline
+\newline
+\newline} 
+\label{fig:grassdiagram_math}
+\end{figure}
+
+\newpage
+%\begin{figure}
+%\includegraphics[width=.97\textwidth]{../figures/popAll-.pdf}
+%\caption{}
+%\end{figure}%shift cmd C
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2_td0.pdf}
+\caption{no burn in, lit no disp goes to zero..like negative}
+\label{fig:noburnin}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wrap0_grd2td1.pdf}
+\caption{1burn in time and zero wrapping:weird. with torodial wrapping its fine though.}
+\label{fig:burnin1wrap0}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20.2_EmodTRUE_wrap0_grd2.pdf}
+\caption{d2=0.2:time 2 is time 1 litter times 0.2, zero wrapping}
+\label{fig:d20.2wrap0}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20.2_EmodTRUE_wraptord_grd2.pdf}
+\caption{d2=0.2:time 2 is time 1 litter times 0.2, tordial wrapping}
+\label{fig:d20.2wraptord}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20.2_EmodTRUE_wraptord_grd4.pdf}
+\caption{d2=0.2:time 2 is time 1 litter times 0.2, tordial wrapping}
+\label{fig:d20.2grid4}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta0.5_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd5.pdf}
+\caption{$\theta <1$ causes sp1 to go away. I guess high theta is important to allow sp2 to leave the patch, creating competitive release for sp1.}
+\label{fig:lowthetagrid5}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta2_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd5.pdf}
+\caption{$\theta =2$ creates opportunity for sp1 to grow and get litter high again. When theta=1, sp1 lower.}
+\label{fig:theta1grid5}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22.05_alph1.3_beta1.1_rho1_theta6_l10.9_l20.1_D0.4_LLfunlogis_d20_EmodTRUE_wrap0_grd2.pdf}
+\caption{Population patch and global dynamics with dispersal and litter, both inter>intra, zero wrapping} 
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22.05_alph1.3_beta1.1_rho1_theta6_l10.9_l20.1_D0.4_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{Population patch and global dynamics with dispersal and litter, both inter>intra, tordial wrapping} 
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wrap0_grd2.pdf}
+\caption{sp1 intra>inter, sp2 inter>intra ($\frac{\alpha_{12}}{\alpha_{22}}>1=1.2$), zero wrapping}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{sp1 intra>inter, sp2 inter>intra ($\frac{\alpha_{12}}{\alpha_{22}}>1=1.2$), tordial wrapping}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam23_alph0.8_beta1.2_rho1_theta6_l10.9_l20.1_D0.4_LLfunlogis_d20_EmodTRUE_wrap0_grd2.pdf}
+\caption{sp2 intra>inter, sp1 inter>intra ($\frac{\alpha_{21}}{\alpha_{11}}>1=1.2$), boost lam2 to 3,zero wrapping}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam23_alph0.8_beta1.2_rho1_theta6_l10.9_l20.1_D0.4_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{sp2 intra>inter, sp1 inter>intra, boost lam2 to 3,tordial wrapping. when D increase to 0.5 sp2 never more than sp1 but still asyn}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph0.8_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wrap0_grd2.pdf}
+\caption{sp2 competitive but intra>inter, zero wrapping}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph0.8_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{sp2 competitive but intra>inter, tordial wrapping. Toridial wrapping makes things quicker?}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.8_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{sp1 intra>inter but increased to 0.8, sp2 inter>intra}
+\end{figure}
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.8_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd3.pdf}
+\caption{sp1 intra>inter but increased to 0.8, sp2 inter>intra}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd3.pdf}
+\caption{sp1 intra>inter turned back down to 0.5, sp2 inter>intra}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wrap0_grd3.pdf}
+\caption{sp1 intra>inter turned back down to 0.5, sp2 inter>intra zero wrapping really affects larger grids}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wrap0_grd9.pdf}
+\caption{sp1 intra>inter turned back down to 0.5, sp2 inter>intra. zero wrapping really affects larger grids}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd9.pdf}
+\caption{sp1 intra>inter turned back down to 0.5, sp2 inter>intra. zero wrapping really affects larger grids}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1_beta1_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{neutral.}
+\label{fig:neutral}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22.3_alph1_beta1_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{neutral-ish, boosted lam2}
+\label{fig:neutral-ish}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2adj1.pdf}
+\caption{adjacent starts}
+\label{fig:pos1}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2adj2.pdf}
+\caption{adjacent starts, but flip whos on top?}
+\label{fig:pos2}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta0.5_rho1_theta5_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wrap0_grd2adj1.pdf}
+\caption{adjacent starts, zero wrapping}
+\label{fig:pos1_wrap0}
+\end{figure}
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta1.2_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd3.pdf}
+\caption{Equal inter>intra. PE. Sp1 wins even without litter because it have more init squares than sp2. wihthout space or lit, winner is up to init. reaches same as lit no dispersal. probs because no lit differences as they stabalize.} 
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=.97\textwidth]{../figures/popAll-lam12_lam22_alph1.2_beta1.2_rho1_theta6_l10.9_l20.1_D0.5_LLfunlogis_d20_EmodTRUE_wraptord_grd2.pdf}
+\caption{Equal inter>intra. PE. Now they have the same starting global abundance. wo space or lit, winner is up to init abundance. With space, they meet at the analytical coexistence equilibrium of 0.2277. Lit no space is same as no space no lit. Globally, all three are at coex equil. Sp1 wins with space and litter because sp2 has no advantages? Still asyn at first. Syn between sp1 no dis and sp2 might inform something about why syn happens. Asyn needs a strong sp2? Boost in sp1 no dis are when lit is giving a benefit but its opposite in sp1. Well the litter is probably different..}
+\end{figure}
+
+% \begin{figure}
+% \includegraphics[width=\textwidth]{../figures/poppatcht-1.pdf}
+% \caption{Population patch dynamics with no dispersal and no litter} 
+% %\label{fig:pedagog1}}
+% \end{figure}
+
+% \begin{figure}
+% \includegraphics[width=\textwidth]{../figures/poppatcht-2.pdf}
+% \caption{Population patch dynamics with dispersal and no litter} 
+% %\label{fig:pedagog1}}
+% \end{figure}
+% 
+\begin{figure}
+\includegraphics[width=\textwidth]{../figures/poppatcht-1and2.pdf}
+\caption{Population patch dynamics combined above. Dispersal quickens dynamics} 
+%\label{fig:pedagog1}}
+\end{figure}
+
+% \begin{figure}
+% \includegraphics[width=\textwidth]{../figures/poppatcht-3.pdf}
+% \caption{Population patch dynamics with no dispersal and litter} 
+% \end{figure}
+% 
+% \begin{figure}
+% \includegraphics[width=\textwidth]{../figures/poppatcht-4.pdf}
+% \caption{Population patch dynamics with dispersal and litter} 
+% \end{figure}
+% 
+\begin{figure}
+\includegraphics[width=\textwidth]{../figures/poppatcht-234.pdf}
+\caption{Population patch dynamics with dispersal and litter} 
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=\textwidth]{../figures/popglob.pdf}
+\caption{Global population dynamics with dispersal and litter. Left is mean, right is sum. Same.} 
+\end{figure}
+
+
+\end{document}

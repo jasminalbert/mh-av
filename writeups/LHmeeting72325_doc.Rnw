@@ -1,0 +1,311 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+%\usepackage{mathrsfs}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\section{Model}
+Additive form
+\[
+N_{t+1} = N_t + r \cdot N_t \cdot \text{(competition term)}
+\]
+
+\[
+N_{1,t+1} = N_{1,t} + r_1 g_1 N_{1,t} \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+\begin{itemize}
+  \item small R (per capita gr)
+  \item can be unstable
+\end{itemize}
+
+Multiplicative form
+\[
+N_{t+1} = N_t \cdot \lambda \cdot \text{(competition term)}
+\]
+\[
+N_{1,t+1} = N_{1,t} \cdot \lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+\begin{itemize}
+  \item $\lambda$ (max fecundity-integer)
+  \item 
+\end{itemize}
+
+\section{Equilibria}
+\subsection*{Equilibrium Conditions}
+
+$N_{1,t+1} = N_{1,t} \cdot \lambda_1 \cdot g_1 \cdot \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)$\newline
+
+\noindent At equilibrium, population sizes do not change from one time step to the next:
+
+\[
+N_{1,t+1} = N_{1,t} = N_1^*, \quad N_{2,t+1} = N_{2,t} = N_2^*
+\]
+
+\noindent Dividing both sides of each equation by \( N_i^* \), we get:
+
+\begin{flalign} \nonumber
+\lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_1^* - \alpha_{12} g_2 N_2^* \right) = 1 &&\\\nonumber
+\lambda_2 g_2 \left(1 - \alpha_{22} g_2 N_2^* - \alpha_{21} g_1 N_1^* \right) = 1 
+\end{flalign}
+
+%For zero growth, we set:
+%\[
+%\frac{N_{1,t+1}}{N_{1,t}} = 1
+%\]
+%\[
+%\lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 \right) = 1
+%\] fine just repetitive
+
+
+\noindent All possible equilibria:\newline
+
+\noindent (1) Trivial Equilibrium 
+
+\[N_1 = 0,\quad N_2 = 0 \]
+
+(2) Species 1 Only (Species 2 extinct) \newline
+
+\indent\indent Set $N_2 = 0$, solve: \newline
+
+\begin{flalign} \nonumber
+& \lambda_1 g_1 (1 - \alpha_{11} g_1 N_1) = 1 &&\\\nonumber
+& N_1^* = \frac{1 - \frac{1}{\lambda_1 g_1}}{\alpha_{11} g_1} &&
+\end{flalign}
+So: $(N_1^*, N_2^*) = \left( \frac{1 - \frac{1}{\lambda_1 g_1}}{\alpha_{11} g_1},\ 0 \right)$ \newline
+
+(3) Species 2 Only (Species 1 extinct) \newline
+
+\noindent Set $N_1 = 0$, solve:
+
+\begin{flalign} \nonumber
+& \lambda_2 g_2 (1 - \alpha_{22} g_2 N_2) = 1 &&\\\nonumber
+& N_2^* = \frac{1 - \frac{1}{\lambda_2 g_2}}{\alpha_{22} g_2} 
+\end{flalign}
+So: $(N_1^*, N_2^*) = \left( 0,\ \frac{1 - \frac{1}{\lambda_2 g_2}}{\alpha_{22} g_2} \right)$\newline
+
+(4) Coexistence Equilibrium\newline
+
+
+
+\subsection*{Solving the System}
+
+Rewriting the equations:
+
+\[
+\alpha_{11} g_1^2 N_1^* + \alpha_{12} g_1 g_2 N_2^* = 1 - \frac{1}{\lambda_1 g_1}
+\]
+\[
+\alpha_{21} g_1 g_2 N_1^* + \alpha_{22} g_2^2 N_2^* = 1 - \frac{1}{\lambda_2 g_2}
+\]
+
+This is a system of two linear equations in \( N_1^* \) and \( N_2^* \). We can write it in matrix form:
+
+\[
+\begin{bmatrix}
+\alpha_{11} g_1^2 & \alpha_{12} g_1 g_2 \\
+\alpha_{21} g_1 g_2 & \alpha_{22} g_2^2
+\end{bmatrix}
+\begin{bmatrix}
+N_1^* \\
+N_2^*
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 - \frac{1}{\lambda_1 g_1} \\
+1 - \frac{1}{\lambda_2 g_2}
+\end{bmatrix}
+\]
+
+\section{Zero Net Growth Isoclines}
+Solving for the ZNGI:
+
+\begin{flalign} \nonumber
+\lambda_i g_i (1 - \alpha_{ii} g_i N_i - \alpha_{ij} g_j N_j) &= 1 &&\\\nonumber
+1 - \alpha_{ii} g_i N_i - \alpha_{ij} g_j N_j &= \frac{1}{\lambda_i g_i} &&\\\nonumber
+\alpha_{ii} g_i N_i + \alpha_{ij} g_j N_j &= 1 - \frac{1}{\lambda_i g_i} &&\\\nonumber
+N_i &= \frac{1 - \frac{1}{\lambda_i g_i} - \alpha_{ij} g_j N_j}{\alpha_{ii} g_i} &&\\\nonumber
+N_j &= \frac{1 - \frac{1}{\lambda_i g_i} - \alpha_{ii} g_i N_i}{\alpha_{ij} g_j} 
+\end{flalign}
+
+Intercepts of species $1$ isocline are\newline
+
+\noindent$N_1=\frac{1 - \frac{1}{\lambda_1 g_1}}{\alpha_{11} g_1}$, when $N_2=0$, and
+
+\noindent$N_2=\frac{1 - \frac{1}{\lambda_1 g_1}}{\alpha_{12} g_2}$, when $N_1=0$.\newline
+
+
+Intercepts of species $2$ isocline are\newline
+
+\noindent$N_1=\frac{1 - \frac{1}{\lambda_2 g_2}}{\alpha_{21} g_1}$, when $N_j=0$, and
+
+\noindent$N_2=\frac{1 - \frac{1}{\lambda_2 g_2}}{\alpha_{22} g_2}$, when $N_i=0$.\newline
+
+\textbf{Posotive growth requires that $g_i\lambda_i > 1$}
+\section{Dispersal}
+Can we get equilibrium conditions when dispersal is included?
+
+\section{trying to get priority effects}
+  
+\subsection*{Conditions for Priority Effects}
+
+Priority effects occur when the outcome of competition depends on initial abundances. Mathematically, this arises when each species is unable to invade the other when rare. For this to occur in the model above, the following conditions must hold:
+
+\[
+\alpha_{ij} > \alpha_{ii} \quad \text{and} \quad \alpha_{ji} > \alpha_{jj}
+\]
+
+Interspecific competition must exceed intraspecific competition. Additionally, for the population to persist, the per capita seed production must be sufficient to maintain or grow the population. This requires:
+
+\[
+\lambda_i \left(1 - \alpha_{ii} g_i N_i - \alpha_{ij} g_j N_j \right) \geq \frac{1}{g_i}
+\]
+
+If this condition is not met, populations will decline to extinction regardless of priority effects.
+
+\subsection*{Example Parameterization}
+
+To achieve priority effects, we use the following symmetric parameter set:
+
+\[
+\begin{aligned}
+\lambda_1 &= \lambda_2 = 5 \\
+g_1 &= g_2 = 0.5 \\
+\alpha_{11} &= \alpha_{22} = 0.01 \\
+\alpha_{12} &= \alpha_{21} = 0.03
+\end{aligned}
+\]
+
+This ensures:
+\begin{itemize}
+    \item Interference from the other species is stronger than from conspecifics,
+    \item Germination and fecundity are sufficient to prevent deterministic extinction.
+\end{itemize}
+
+\subsection*{Simulation Results}
+
+We simulate two initial conditions:
+
+\begin{enumerate}
+    \item $N_1(0) = 10$, $N_2(0) = 1$,
+    \item $N_1(0) = 1$, $N_2(0) = 10$.
+\end{enumerate}
+
+In both cases, the initially dominant species excludes the other, indicating the presence of strong priority effects and alternative stable states.
+
+\section*{Rationale for Parameter Choice Producing Priority Effects}
+
+To generate priority effects in a discrete-time Lotka-Volterra competition model with germination and no seed survival, we require two conditions:
+
+\begin{enumerate}
+    \item \textbf{Mutual non-invasibility:} Each species must be unable to invade when rare. This occurs when interspecific competition exceeds intraspecific competition, i.e.,
+    \[
+    \alpha_{ij} > \alpha_{ii}, \quad \alpha_{ji} > \alpha_{jj}.
+    \]
+    This condition ensures that the equilibrium point where both species coexist is unstable, and that initial abundances determine the competitive outcome.
+
+    \item \textbf{Positive growth at moderate densities:} The per capita fecundity of each species must be high enough that populations do not decline to extinction due to competition. For persistence of species $i$ at density $N_i$, the model:
+    \[
+    N_i(t+1) = g_i N_i(t) \cdot \lambda_i \left(1 - \alpha_{ii} g_i N_i(t) - \alpha_{ij} g_j N_j(t) \right)
+    \]
+    requires that:
+    \[
+    \lambda_i \left(1 - \alpha_{ii} g_i N_i - \alpha_{ij} g_j N_j \right) \geq \frac{1}{g_i}
+    \]
+    to prevent deterministic extinction. This means that the net reproductive rate per seed must exceed $1$ after accounting for competition.
+
+\end{enumerate}
+
+\section{Unified model}
+Scaling parameters to reduce the number of parameters in the model.
+
+Let,
+\[
+\lambda_1 = 1, \quad \alpha_{11} =1, \quad \alpha_{22}=1
+\]
+\[
+\lambda = \frac{\lambda_2}{\lambda_1},\quad\alpha=\frac{\alpha_{12}}{\alpha_{11}}\quad\beta=\frac{\alpha_{21}}{\alpha_{22}}.
+\]
+Scaling parameters gives us the new simplified model:
+\begin{flalign}
+N_1(t+1,x) &= N_1(t,x)(1-N_1(t,x)-\alpha N_2(t,x)) &&\\
+N_2(t+1,x) &= \lambda N_2(t,x)(1-N_2(t,x)-\beta N_1(t,x))
+\end{flalign}
+
+\subsection{Equilibria}
+\begin{flalign}
+1&=\frac{N_1(t+1,x)}{N_1(t,x)} &&\\
+1&=1-N_1(t,x)-\alpha N_2(t,x) &&\\
+1+N_1^*&=1-\alpha N_2(t,x) &&\\
+N_1^* &= -\alpha N_2(t,x)
+\end{flalign}
+
+\begin{flalign}
+1&=\frac{N_2(t+1,x)}{N_2(t,x)} &&\\
+1&= \lambda (1-N_2^*-\beta N_1(t,x)) &&\\
+\frac{1}{\lambda} &= 1-N_2^*-\beta N_1(t,x) &&\\
+N_2^*+\frac{1}{\lambda} &= 1-\beta N_1(t,x) &&\\
+N_2^* &= 1-\beta N_1(t,x)-\frac{1}{\lambda}  &&\\
+N_2^* &= \frac{\lambda -1}{\lambda}-\beta N_1(t,x)
+\end{flalign}
+
+\subsection{coexistence equilibrium}
+
+\begin{flalign}
+N_2^* &= \frac{\lambda -1}{\lambda}-\beta N_1(t,x) &&\\
+N_2^* &= \frac{\lambda -1}{\lambda}-\beta(-\alpha N_2^*) &&\\
+N_2^* &= \frac{\lambda -1}{\lambda}-\beta(-\alpha N_2^*) &&\\
+N_2^*+\frac{1}{\lambda} &= 1-\beta N_1(t,x) &&\\
+N_2^* &= 1-\beta N_1(t,x)-\frac{1}{\lambda}  
+\end{flalign}
+
+
+\subsection{Isocline Intercepts}
+\begin{enumerate}
+  \item When $N_1$ is at equilibrium and
+    \begin{enumerate} \item $N_1 =0$:
+        \begin{enumerate}\item[ ] $N_2 = -\frac{N_1}{\alpha}=0$
+        \end{enumerate}
+    \item $N_2=0$:
+        \begin{enumerate}\item[ ] $N_1=0$
+        \end{enumerate}
+    \end{enumerate}
+  \item When $N_2$ is at equilibrium
+    \begin{enumerate} \item $N_1 =0$:
+        \begin{enumerate}\item[ ] $N_2 = \frac{\lambda -1}{\lambda}$
+        \end{enumerate}
+    \item $N_2=0$:
+        \begin{enumerate}\item[ ] $N_1=\frac{\lambda -1}{\lambda\beta}$
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Growth requirements}
+\begin{flalign}
+1&<1-N_1(t,x)-\alpha N_2(t,x) &&\\
+N_1(t,x)&<-\alpha N_2(t,x) &&\\
+\frac{N_1(t,x)}{N_2(t,x)}&<-\alpha &&\\
+\frac{N_1(t,x)}{N_2(t,x)}&>\alpha
+\end{flalign}
+
+\begin{flalign}
+1&<\lambda (1-N_2^*-\beta N_1(t,x)) &&\\
+\frac{1}{\lambda} &< (1-N_2^*-\beta N_1(t,x)) &&\\
+\frac{1}{\lambda}+N_2^* &< (1-\beta N_1(t,x)) &&\\
+N_2^* &< (1-\beta N_1(t,x))-\frac{1}{\lambda}&&\\
+N_2^*+ N_1(t,x)) &< \frac{1-\frac{1}{\lambda}}{\beta} &&\\
+\lambda &>1, \quad \beta>0
+\end{flalign}
+
+\section{new non-dimensional model}
+
+
+\end{document}
+
+
+
+
+

@@ -1,0 +1,162 @@
+
+\documentclass{article}
+\usepackage{xcolor}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\section{pre-lab retreat}
+\paragraph{meta-community framework}
+\begin{itemize}
+\item neutral
+\item patch dynamics: ephameral patches? colonization-competition tradeoff
+\item niche control
+\item mass effects: source-sink dynamics
+\item parallels with invasion biology
+\end{itemize}
+
+\paragraph{synchrony}
+\begin{itemize}
+\item network?
+\item community AND population \textcolor{blue}{asynchrony}
+\item AKA temporal AND spatial -- right?
+\end{itemize}
+
+\section{my stuff}
+define endogenous feedbacks - Cal
+
+explain more about the assumption of environmental heterogeneity when space is included -Cal
+
+push - pull theory is a lot in invasion but not in coexistence
+we've been thinking about spreading across landscape across landscape 
+but can be an spatially dependent coex mechanism developed endogenously 
+
+push - like environment push
+pull - if you like someone else environment, it pulls you in and move you across landscape
+new concept of coesistence dynamics
+
+idea and novelty in one breathe 
+
+any reason to tie to something bigger - applied 
+avena is pretty much monoculture
+mh can get to that point but usually coexisting
+
+another step bigger - avena is probably worse 
+
+ashely shaw journal of ecology -ecosystem function all avena or biodiverse
+
+debate if its a avena/mh paper of push/pull dyanmcis translating into coexistence world
+modeling with case study - need to look into literature for more push/pull dynamics
+interesting that its between two invasives 
+
+broader literature that controlled by push or pull
+what happens when dyanmcis stbalize
+we thought alot about the spread, the S curve but what happens at the top
+
+disturbance factor - fire?
+-gophers. as discussion point. also dry years versus wet years
+
+what would happen if germination comes back in 
+
+tighten -this is the model and this is the parameterization for the species
+
+give a separate section for the parameters for each species
+
+make a figure for dispersal fuction for x and different origins 
+
+general vs system specific one
+call it feedback term
+be specific about what is use specifically 
+in simulation section say in the simulation 
+
+big G to be explicit about this model is number of germinants
+
+Justification of burn in time 
+-allows for spread S curve and then dynamics comes in at equilibrium
+
+-established patch and then 
+
+more sign posting in fig 1
+
+three things
+
+push/pull - add litter
+
+demonstrate that medusahead is making more seeds and push
+
+avena 
+
+one is called push and one is called pull
+insets of what happens in litter and not litter 
+
+label year 1 and year 2
+
+anootate along side that local populations swap but landscape pops staid the same
+coexistece is occuring at landscape scale but would not locally
+
+one to refer in intro as it builds .. so no math 
+
+shao peing compensatory dynamics in different patches 
+
+#ask leah for room
+
+USDA grants 2,3,16 LH will be working on feverishly
+sciIn foundation ECOevo grant oct 16 scimon
+suding macarther topology -ecoevo 
+foundational calls
+hazelnuts (seed sourcing), basin, soil health (hazelnuts)
+
+physically gone but also crazy
+
+tomorrow
+
+
+lab management 
+
+"its a nightmare"..?
+
+put CAREER boxes where MEGACOMP was
+
+PUT SHIT AWAY
+if its worth >500 dollars but it away immediately 
+
+optimal undergrad solution for
+communicating needs from und
+after 2 quarters of good work and effort to secure own funding 
+then can consider compensation
+
+first lab meeting is new student orientation - come with questions!
+
+
+
+\section{push-pull dyanmics analogy in psychology}
+Anxious + anvoidant relationships.
+Anxious partner pulls in avoidants 
+but they get too close and avoidant partner pushes awy anxious partner.
+
+Litter pulls in Avena and then medusahead gets pushed out.
+The litter is kindof like the "crazy-ness" that the anxious partner creates
+or like the situation theyre using to pull in the avoidant partner.
+Medusahead is anxious needs closeness so it makes litter to pull
+in its avoidant partner, Avena. But then the litter than the
+anxious partner made itself causes the anxious partner to be pushed out.
+(And Avena competion?). Some sort of lag. 
+
+Push pull dynamics describe many things in the natural world. 
+Human migration, supply chain, cellular and biochemical processes..
+Range shifts
+
+Previous studies model and experimentally show oscillating
+bistatbility of cell states depending on external
+signal (baceteria) or resource (yeast, Krishna 2018)
+They call it "asynchronous, heterogenous cultures of cells"
+-asynchronus through time; heterogenous through space
+
+
+
+
+https://demonstrations.wolfram.com/LotkaVolterraCompetitionModel/
+
+
+
+
+\end{document}

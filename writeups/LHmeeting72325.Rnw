@@ -1,0 +1,87 @@
+\documentclass{beamer}
+\usetheme{Boadilla}
+
+\title{LH meeting}
+\subtitle{July 22 2025}
+\author{Jasmin Albert}
+
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Model}
+Additive form
+\[
+N_{t+1} = N_t + r \cdot N_t \cdot \text{(competition term)}
+\]
+
+\[
+N_{1,t+1} = N_{1,t} + r_1 g_1 N_{1,t} \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+\begin{itemize}
+  \item small R (per capita gr)
+  \item can be unstable
+\end{itemize}
+
+Multiplicative form
+\[
+N_{t+1} = N_t \cdot \lambda \cdot \text{(competition term)}
+\]
+\[
+N_{1,t+1} = N_{1,t} \cdot \lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+\begin{itemize}
+  \item $\lambda$ (max fecundity-integer)
+  \item 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Equlibria}
+\[
+N_{1,t+1} = N_{1,t} \cdot \lambda_1 \cdot g_1 \cdot \left(1 - \alpha_{11} g_1 N_{1,t} - \alpha_{12} g_2 N_{2,t} \right)
+\]
+For zero growth, we set:
+\[
+\frac{N_{1,t+1}}{N_{1,t}} = 1
+\]
+\[
+\lambda_1 g_1 \left(1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 \right) = 1
+\]
+
+Solving for the ZNGI:
+
+\[
+1 - \alpha_{11} g_1 N_1 - \alpha_{12} g_2 N_2 = \frac{1}{\lambda_1 g_1}
+\]
+\[
+\alpha_{11} g_1 N_1 + \alpha_{12} g_2 N_2 = 1 - \frac{1}{\lambda_1 g_1}
+\]
+\[
+N_1 = \frac{1 - \frac{1}{\lambda_1 g_1} - \alpha_{12} g_2 N_2}{\alpha_{11} g_1}
+\]
+\end{frame}       
+
+\begin{frame}
+\frametitle{}
+\end{frame}
+
+\begin{frame}
+\frametitle{}
+\end{frame}
+
+\begin{frame}
+\frametitle{}
+\end{frame}
+
+\begin{frame}
+\frametitle{}
+\end{frame}
+
+\end{document}
